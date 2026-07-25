@@ -753,6 +753,19 @@
     const resetCalibration = (id) => updateDrum(id, { calibratedA: null, calibLugInput: "", calibFundInput: "" });
     return /* @__PURE__ */ React.createElement("div", { className: "min-h-screen bg-[#1a140d] text-[#e8dcc4]", style: { fontFamily: "Georgia, 'Iowan Old Style', serif" } }, /* @__PURE__ */ React.createElement("style", null, `
         input, select { font-family: ui-monospace, 'SF Mono', Menlo, monospace; }
+        select {
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        input[type=number] {
+          -moz-appearance: textfield;
+        }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: #5c4a33; border-radius: 4px; }
         .print-only { display: none; }
