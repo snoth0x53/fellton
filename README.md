@@ -1,7 +1,7 @@
 # Fellton
 
 Ein kleiner, eigenständiger Web-Rechner zum Stimmen von Schlagzeugfellen. Kein
-Build-Step, kein Backend – läuft komplett im Browser.
+Build-Step, kein Backend – läuft komplett im Browser, auch offline.
 
 🔗 **Live:** https://snoth0x53.github.io/fellton/
 
@@ -9,10 +9,8 @@ Build-Step, kein Backend – läuft komplett im Browser.
 
 - Grundton (Note + Oktave) und Resonance-Modus pro Trommel einstellen
 - Automatische Berechnung der Ziel-Lug-Frequenzen für Schlag- und Resonanzfell
-- Durchmesser und Tiefe frei eingeben (Komma oder Punkt als Dezimaltrennzeichen)
-- Tiefen-Heuristik: schätzt den Einfluss der Kesseltiefe auf die nötige Fellspannung
 - **Kalibrierfunktion:** eigene gemessene Werte eintragen (Lug-Frequenz + reale
-  Fundamentalfrequenz) und damit die Schätzung durch echte Messwerte ersetzen
+  Fundamentalfrequenz) und damit die Standardwerte durch echte Messwerte ersetzen
 - **Kreuz-Stimmreihenfolge:** Der Lug-Kreis zeigt die empfohlene Stimm-Reihenfolge –
   immer zum gegenüberliegenden Lug, dann eine Schraube weiter und wieder gegenüber,
   sodass sich die Spannung gleichmäßig verteilt
@@ -31,18 +29,18 @@ Build-Step, kein Backend – läuft komplett im Browser.
 
 ## Lug-für-Lug stimmen mit der Mikrofon-Messung
 
-Die Mikrofon-Messung erkennt die Frequenz jedes Anschlags. Wo du anschlägst,
+Die Mikrofon-Messung erkennt die Frequenz jedes Anschlags einzeln. Wo du anschlägst,
 bestimmt, was gemessen wird:
 
 - **Nah am Lug anschlagen** (2–3 cm vom Rand) → die Lug-Frequenz dieser Schraube.
   So bringst du alle Lugs nacheinander auf denselben Wert.
 - **Mittig anschlagen** → der Grundton der ganzen Trommel.
 
-Für ein sauberes Ergebnis pro Lug mehrfach anschlagen – das Tool sucht über mehrere
-Anschläge den stabilsten wiederkehrenden Ton und blendet einzelne Ausreißer
-(Raumreflexionen, kurze Obertöne) aus. Nach einer kurzen Pause startet die Erkennung
-frisch, sodass du beim Wechsel zum nächsten Lug einfach weitermachen kannst. Die Snare
-am besten mit ausgehängtem Teppich messen, damit das Rasseln nicht ins Signal kommt.
+Jeder Anschlag wird für sich ausgewertet und die kräftigste Frequenzgruppe angezeigt –
+ohne Verrechnung über mehrere Schläge, damit ein einzelner Fehlgriff sich nicht auf
+die folgenden Messungen überträgt. Die Messung läuft, bis du sie manuell stoppst.
+Die Snare am besten mit ausgehängtem Teppich messen, damit das Rasseln nicht ins
+Signal kommt.
 
 ### Filter für den Hochtonbereich
 
@@ -103,9 +101,11 @@ Für **Snares** gilt ein eigener, dort separat beschriebener Ansatz (nicht die
 Resonance-Modi oben): Schlagfell ≈ Grundton × 1,4, Resofell = Schlagfell ×
 musikalisches Intervall (Standard: Quinte ×1,5).
 
-Die Tiefen-Heuristik in diesem Tool ist **keine offizielle Formel**, sondern eine
-eigene, transparent gekennzeichnete Näherung – siehe Hinweis im Footer der Seite.
-Für maximale Genauigkeit empfiehlt sich die Kalibrierfunktion mit echten Messwerten.
+Eine frühere Version enthielt zusätzlich eine Heuristik, die den Einfluss der
+Kesseltiefe abschätzen sollte. Sie wurde entfernt, weil sie in der Praxis keine
+verlässlichen Ergebnisse lieferte – auch Hardware-Stimmgeräte berücksichtigen die
+Tiefe nicht. Für trommelspezifische Genauigkeit ist die Kalibrierfunktion der
+richtige Weg.
 
 ## Profi-Durchschnitt: eigene Analyse realer Artist-Tunings
 
@@ -142,26 +142,22 @@ hält die Anzeige zum bequemen Ablesen fest.
 
 **Wichtig:** Mikrofonzugriff funktioniert nur in einem echten Browser-Tab über
 HTTPS (oder `localhost`) – nicht in eingebetteten Vorschau-Fenstern. Für lokale
-Tests ohne Upload: `python3 -m http.server 8000` im Ordner mit der Datei, dann
-`http://localhost:8000/mic-test.html` öffnen. Fürs iPhone im selben lokalen Test
-zusätzlich ein HTTPS-Tunnel nötig (z. B. `cloudflared tunnel --url http://localhost:8000`).
+Tests: `python3 -m http.server 8000` im Projektordner, dann
+`http://localhost:8000` öffnen.
 
 ## Genauigkeit der Mikrofon-Messung
 
 Nach jedem Anschlag wird das Frequenzspektrum per FFT analysiert (Fenstergröße 32768):
 Alle Peaks über einer Schwelle (18 dB unter dem stärksten) werden ermittelt und nach
 spektraler Nähe gruppiert. Der Gruppierungsabstand skaliert mit der Frequenz (6 %,
-mindestens 8 Hz), weil die Partialtöne nach oben hin enger zusammenrücken. Über
-mehrere Anschläge hinweg wählt das Tool den Ton, der am konstantesten wiederkehrt
-(Toleranz ca. 4 %). Das filtert springende Störpeaks heraus. Parabel-Interpolation
-verfeinert die Auflösung auf unter 1 Hz.
+mindestens 8 Hz), weil die Partialtöne nach oben hin enger zusammenrücken. Angezeigt
+wird die kräftigste Gruppe des jeweiligen Anschlags. Parabel-Interpolation verfeinert
+die Auflösung auf unter 1 Hz.
 
 Zusätzliche Maßnahmen:
 
 - **Plausible Frequenzbereiche je Trommelart:** Bassdrum 30–160 Hz, Toms 50–350 Hz,
   Snare 50–450 Hz
-- **Neustart nach Pause:** Bleibt eine kurze Zeit ein Anschlag aus, beginnt die
-  Erkennung frisch – praktisch beim Wechsel von Lug zu Lug
 - **Filter** (siehe oben) für den kritischen Hochtonbereich
 
 Ein Vergleich gegen ein Hardware-Stimmgerät ergab im Normalbereich sehr ähnliche
@@ -174,17 +170,26 @@ Mikrofon aus größerer Distanz.
 
 ## Technik
 
-Einzelne `index.html`-Datei: React + ReactDOM per CDN eingebunden, Tailwind CSS
-per CDN, der eigentliche App-Code ist vorab zu reinem JavaScript kompiliert
+Einzelne `index.html`-Datei: React + ReactDOM und Tailwind CSS liegen als lokale
+Kopien im Ordner `lib/`, der App-Code ist vorab zu reinem JavaScript kompiliert
 (kein Live-Babel im Browser). Kein npm, kein eigener Build-Schritt beim Deployen,
 direkt als statische Seite über GitHub Pages hostbar.
 
+Die Bibliotheken wurden bewusst lokal abgelegt statt per CDN eingebunden, damit die
+App vollständig ohne Internetverbindung läuft – praktisch im Proberaum. Für die
+Überschriften wird dadurch die Systemschrift (Georgia) statt Playfair Display
+verwendet.
+
 ## Nutzung lokal
 
-`index.html` lässt sich direkt im Browser öffnen (auch per Doppelklick) – für alle
-Funktionen außer der Mikrofon-Messung reicht das (Internetverbindung für die
-CDN-Skripte wird benötigt). Für den "🎤 Messen"-Button braucht es wie beim
-Mikrofon-Test-Tool einen sicheren Kontext (HTTPS oder `localhost`), siehe oben.
+`index.html` lässt sich direkt im Browser öffnen – für alle Funktionen außer der
+Mikrofon-Messung reicht das. Für den "🎤 Messen"-Button braucht es einen sicheren
+Kontext (HTTPS oder `localhost`):
+
+    cd ~/Documents/fellton
+    python3 -m http.server 8000
+
+Dann im Browser `http://localhost:8000` öffnen.
 
 ## Haftungsausschluss
 
