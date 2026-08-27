@@ -319,16 +319,22 @@
     const groups = subsets.map((s) => best(s));
     return { groups };
   }
-  // W\xE4hlt aus den Gruppen eines Anschlags die kr\xE4ftigste aus.
-  // filterHz (optional): nur Gruppen im Halbton-Band um diesen Wert kommen infrage.
-  function pickStrongestGroup(groups, filterHz = null) {
+  // Membranmoden-Verhältnisse: (0,1)=1 → (1,1)≈1.59 → (2,1)≈2.14 → (0,2)≈2.30 → (3,1)≈2.65
+const MODE_RATIOS = [1.59, 2.14, 2.30, 2.65];
+function pickStrongestGroup(groups, filterHz = null) {
   const candidates = filterHz == null ? groups : groups.filter((g) => g.freq >= filterHz / FILTER_BAND && g.freq <= filterHz * FILTER_BAND);
   if (candidates.length === 0) return null;
-  // Tiefste Gruppe innerhalb 6 dB des stärksten Peaks bevorzugen
-  const maxDb = Math.max(...candidates.map(g => g.db));
-  return candidates
-    .filter(g => g.db >= maxDb - 6)
-    .reduce((m, g) => g.freq < m.freq ? g : m).freq;
+  if (candidates.length === 1) return candidates[0].freq;
+  // Tiefste Gruppe wählen, die durch mindestens eine Obermode bestätigt wird (±8 %).
+  // Fallback: tiefste Gruppe.
+  const sorted = [...candidates].sort((a, b) => a.freq - b.freq);
+  for (const cand of sorted) {
+    const confirmed = MODE_RATIOS.some(r =>
+      sorted.some(g => Math.abs(g.freq / cand.freq - r) / r < 0.08)
+    );
+    if (confirmed) return cand.freq;
+  }
+  return sorted[0].freq;
 }
   const MIC_RANGE = {
     "Bass Drum": { min: 30, max: 160 },

@@ -699,12 +699,18 @@
     const { freq: yinFreq } = detectPitch(timeBuf, audioCtx.sampleRate);
 
     if (groups.length) {
-      // Tiefste Gruppe innerhalb 6 dB des stärksten Peaks bevorzugen —
-      // Lug-Ton ist fast immer die tiefste dominante Gruppe, nicht unbedingt die lauteste
-      const maxDb = Math.max(...groups.map(g => g.db));
-      const strongest = groups
-        .filter(g => g.db >= maxDb - 6)
-        .reduce((m, g) => g.freq < m.freq ? g : m);
+      // Membranmoden-Verhältnisse: (0,1)=1 → (1,1)≈1.59 → (2,1)≈2.14 → (0,2)≈2.30 → (3,1)≈2.65
+      // Tiefste Gruppe wählen, die durch mindestens eine Obermode bestätigt wird (±8 %).
+      // Fallback: einfach tiefste Gruppe.
+      const MODE_RATIOS_LIVE = [1.59, 2.14, 2.30, 2.65];
+      const sortedLive = [...groups].sort((a, b) => a.freq - b.freq);
+      let strongest = sortedLive[0];
+      for (const cand of sortedLive) {
+        const confirmed = MODE_RATIOS_LIVE.some(r =>
+          sortedLive.some(g => Math.abs(g.freq / cand.freq - r) / r < 0.08)
+        );
+        if (confirmed) { strongest = cand; break; }
+      }
       pitchDisplay.textContent = strongest.freq.toFixed(1) + ' Hz';
       peakList.textContent = groups.map(g => g.freq.toFixed(0)).join(' · ') + ' Hz';
     }
@@ -723,11 +729,16 @@
         const yinSnap = detectPitch(t2, audioCtx.sampleRate);
         const snapRMS = calcRMS(t2);
         if (snap && snap.groups.length) {
-          // Tiefste Gruppe innerhalb 6 dB als Hauptwert — identisch zur Live-Anzeige
-          const snapMaxDb = Math.max(...snap.groups.map(g => g.db));
-          const snapMain = snap.groups
-            .filter(g => g.db >= snapMaxDb - 6)
-            .reduce((m, g) => g.freq < m.freq ? g : m);
+          // Identische Logik wie Live-Anzeige: tiefste moden-bestätigte Gruppe
+          const MODE_RATIOS_SNAP = [1.59, 2.14, 2.30, 2.65];
+          const sortedSnap = [...snap.groups].sort((a, b) => a.freq - b.freq);
+          let snapMain = sortedSnap[0];
+          for (const cand of sortedSnap) {
+            const confirmed = MODE_RATIOS_SNAP.some(r =>
+              sortedSnap.some(g => Math.abs(g.freq / cand.freq - r) / r < 0.08)
+            );
+            if (confirmed) { snapMain = cand; break; }
+          }
           const gs = [snapMain.freq, ...snap.groups
             .filter(g => g !== snapMain)
             .map(g => g.freq)];
