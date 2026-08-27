@@ -361,6 +361,13 @@
     return { freq, rms };
   }
 
+  // ── Note aus Hz ───────────────────────────────────────────────────────────
+  function hzToNote(hz) {
+    const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    const midi = Math.round(12 * Math.log2(hz / 440) + 69);
+    return names[((midi % 12) + 12) % 12];
+  }
+
   // ── RMS ───────────────────────────────────────────────────────────────────
   function calcRMS(buf) {
     let sum = 0;
@@ -711,10 +718,10 @@
         );
         if (confirmed) { strongest = cand; break; }
       }
-      pitchDisplay.textContent = strongest.freq.toFixed(1) + ' Hz';
+      pitchDisplay.textContent = strongest.freq.toFixed(1) + ' Hz (' + hzToNote(strongest.freq) + ')';
       peakList.textContent = groups.map(g => g.freq.toFixed(0)).join(' · ') + ' Hz';
     }
-    if (yinFreq > 0) yinDisplay.textContent = yinFreq.toFixed(1) + ' Hz';
+    if (yinFreq > 0) yinDisplay.textContent = yinFreq.toFixed(1) + ' Hz (' + hzToNote(yinFreq) + ')';
 
     // Onset — abgesenkte Schwellen für schwächere Mikrofone
     if (!onsetActive && rmsLive > 0.015) {
@@ -744,7 +751,10 @@
             .map(g => g.freq)];
           history.push(gs);
           if (history.length > HISTORY_SIZE) history.shift();
-          stableDisplay.textContent = (pickStablePeak(history) ?? '—').toFixed ? pickStablePeak(history).toFixed(1) + ' Hz' : '—';
+          const stableHz = pickStablePeak(history);
+          stableDisplay.textContent = stableHz != null
+            ? stableHz.toFixed(1) + ' Hz (' + hzToNote(stableHz) + ')'
+            : '—';
           const score = computeSoundScore(t2, d2, audioCtx.sampleRate, analyser.fftSize);
           renderScore(score);
           hits.push({
