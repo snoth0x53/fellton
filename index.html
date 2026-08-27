@@ -322,10 +322,14 @@
   // W\xE4hlt aus den Gruppen eines Anschlags die kr\xE4ftigste aus.
   // filterHz (optional): nur Gruppen im Halbton-Band um diesen Wert kommen infrage.
   function pickStrongestGroup(groups, filterHz = null) {
-    const candidates = filterHz == null ? groups : groups.filter((g) => g.freq >= filterHz / FILTER_BAND && g.freq <= filterHz * FILTER_BAND);
-    if (candidates.length === 0) return null;
-    return candidates.reduce((m, g) => g.db > m.db ? g : m).freq;
-  }
+  const candidates = filterHz == null ? groups : groups.filter((g) => g.freq >= filterHz / FILTER_BAND && g.freq <= filterHz * FILTER_BAND);
+  if (candidates.length === 0) return null;
+  // Tiefste Gruppe innerhalb 6 dB des stärksten Peaks bevorzugen
+  const maxDb = Math.max(...candidates.map(g => g.db));
+  return candidates
+    .filter(g => g.db >= maxDb - 6)
+    .reduce((m, g) => g.freq < m.freq ? g : m).freq;
+}
   const MIC_RANGE = {
     "Bass Drum": { min: 30, max: 160 },
     "Tom": { min: 50, max: 350 },
