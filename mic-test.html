@@ -1,3 +1,6 @@
+
+
+Mic test · HTML
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -21,12 +24,20 @@
   main { max-width: 900px; margin: 0 auto; padding: 24px; }
   .card { border: 1px solid var(--border); background: var(--card); border-radius: 3px; padding: 20px; margin-bottom: 20px; }
   label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
-  select, button {
+  select, input[type="text"], input[type="number"], textarea {
     font-family: ui-monospace, 'SF Mono', Menlo, monospace; background: var(--card2);
     border: 1px solid var(--border); color: var(--cream); border-radius: 3px; padding: 8px 10px; font-size: 14px;
   }
   select { width: 100%; }
-  button { cursor: pointer; border-color: var(--gold); color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; font-size: 12px; padding: 10px 18px; }
+  textarea { width: 100%; resize: vertical; min-height: 60px; }
+  input[type="text"], input[type="number"] { width: 100%; }
+  button {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    background: var(--card2); border: 1px solid var(--border); color: var(--cream);
+    border-radius: 3px; padding: 8px 10px; font-size: 14px;
+    cursor: pointer; border-color: var(--gold); color: var(--gold);
+    text-transform: uppercase; letter-spacing: 0.05em; font-size: 12px; padding: 10px 18px;
+  }
   button:hover { background: var(--gold); color: var(--bg); }
   button:disabled { opacity: 0.4; cursor: default; background: none; color: var(--gold); }
   .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
@@ -34,22 +45,42 @@
   canvas { width: 100%; display: block; background: var(--card2); border: 1px solid var(--border); border-radius: 3px; }
   .meterWrap { height: 14px; background: var(--card2); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; margin-top: 8px; }
   .meterBar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--green), var(--gold), var(--red)); transition: width 0.05s linear; }
+  .meterLabel { font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); text-align: right; margin-top: 3px; }
   .pitchDisplay { font-family: ui-monospace, monospace; font-size: 42px; text-align: center; padding: 16px 0 4px; }
   .pitchLabel { text-align: center; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
   .subValue { font-family: ui-monospace, monospace; font-size: 13px; text-align: center; color: var(--muted); padding: 2px 0; }
   .subValue b { color: var(--gold); font-weight: normal; }
   .peakList { font-family: ui-monospace, monospace; font-size: 15px; text-align: center; color: var(--gold); padding: 6px 0 2px; min-height: 20px; }
-  .freezeRow { display: flex; justify-content: center; margin-top: 12px; }
+  .freezeRow { display: flex; justify-content: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
   table { width: 100%; border-collapse: collapse; font-family: ui-monospace, monospace; font-size: 13px; margin-top: 10px; }
   th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); }
   th { color: var(--muted); font-weight: normal; text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; }
   .statusDot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-right: 6px; }
   .statusDot.live { background: var(--green); box-shadow: 0 0 6px var(--green); }
   .hint { font-size: 12px; color: var(--muted); line-height: 1.6; margin-top: 10px; }
+ 
+  /* Sound Score */
+  .scoreWrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-top: 8px; }
+  .scoreBig { font-family: ui-monospace, monospace; font-size: 56px; color: var(--gold); min-width: 90px; }
+  .scoreFactors { flex: 1; min-width: 200px; }
+  .scoreFactor { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+  .scoreFactorName { color: var(--muted); width: 140px; flex-shrink: 0; }
+  .scoreFactorBar { flex: 1; height: 6px; background: var(--card2); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+  .scoreFactorFill { height: 100%; background: var(--gold); transition: width 0.2s; }
+  .scoreFactorVal { width: 32px; text-align: right; color: var(--cream); font-family: ui-monospace, monospace; }
+ 
+  /* Sterne-Bewertung */
+  .stars { display: flex; gap: 6px; margin-top: 4px; }
+  .stars span { font-size: 22px; cursor: pointer; color: var(--border); transition: color 0.1s; }
+  .stars span.active { color: var(--gold); }
+ 
+  /* Metadata-Formular */
+  .metaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 540px) { .metaGrid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-
+ 
 <header>
   <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
     <div>
@@ -63,8 +94,9 @@
   </div>
   <p class="sub" data-i18n="sub">Prüft ein Mikrofon-Setup, bevor es in Fellton zum Einsatz kommt. Die Auswertung nutzt dieselbe Spektralanalyse wie der Rechner, sodass sich die Werte direkt vergleichen lassen — zusätzlich mit Verlauf über die letzten Anschläge.</p>
 </header>
-
+ 
 <main>
+  <!-- Gerät & Steuerung -->
   <div class="card">
     <div class="row">
       <div>
@@ -78,7 +110,34 @@
     </div>
     <p class="hint"><span class="statusDot" id="statusDot"></span><span id="statusText" data-i18n="notConnected">Nicht verbunden</span></p>
   </div>
-
+ 
+  <!-- Metadaten-Formular -->
+  <div class="card">
+    <label data-i18n="metaLabel">Trommel-Metadaten (für CSV-Export)</label>
+    <div class="metaGrid">
+      <div>
+        <label for="metaDrum" data-i18n="metaDrumLabel">Trommel / Modell</label>
+        <input type="text" id="metaDrum" placeholder="z.B. Rogers Dynasonic 14x5" />
+      </div>
+      <div>
+        <label for="metaHead" data-i18n="metaHeadLabel">Fell-Typ (optional)</label>
+        <input type="text" id="metaHead" placeholder="z.B. Remo Ambassador Coated" />
+      </div>
+      <div>
+        <label data-i18n="metaRatingLabel">Subjektive Bewertung (1–5)</label>
+        <div class="stars" id="starRating">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span>
+          <span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+      </div>
+      <div>
+        <label for="metaNotes" data-i18n="metaNotesLabel">Notizen (optional)</label>
+        <textarea id="metaNotes" rows="2" placeholder="z.B. Stimmung nach Konzert, Snare-Seite locker"></textarea>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Hauptanzeige -->
   <div class="card">
     <div class="pitchLabel" data-i18n="mainLabel">Stärkste Gruppe (wie im Rechner)</div>
     <div class="pitchDisplay" id="pitchDisplay">— Hz</div>
@@ -87,88 +146,176 @@
     <div class="pitchLabel" style="margin-top:12px;" data-i18n="groupLabel">Gruppen im Spektrum</div>
     <div class="peakList" id="peakList">—</div>
     <div class="meterWrap"><div class="meterBar" id="meterBar"></div></div>
-    <div class="freezeRow"><button id="freezeBtn" disabled data-i18n="freezeBtn">Einfrieren</button></div>
-    <p class="hint" data-i18n="levelHint">Pegel (RMS). Je lauter/klarer der Anschlag, desto zuverlässiger die Erkennung. "Einfrieren" hält den aktuellen Wert fest.</p>
+    <div class="meterLabel" id="meterLabel">—</div>
+    <div class="freezeRow">
+      <button id="freezeBtn" disabled data-i18n="freezeBtn">Einfrieren</button>
+      <button id="clearBtn" disabled data-i18n="clearBtn">Log leeren</button>
+      <button id="exportBtn" disabled data-i18n="exportBtn">CSV exportieren</button>
+    </div>
+    <p class="hint" data-i18n="levelHint">Pegel (RMS). Je lauter/klarer der Anschlag, desto zuverlässiger die Erkennung.</p>
   </div>
-
+ 
+  <!-- Sound Score -->
+  <div class="card">
+    <label data-i18n="soundScoreLabel">Sound Score (letzter Anschlag)</label>
+    <div class="scoreWrap">
+      <div class="scoreBig" id="scoreDisplay">—</div>
+      <div class="scoreFactors" id="scoreFactors">
+        <div class="scoreFactor"><span class="scoreFactorName" data-i18n="sfAttack">Attack-Schärfe</span><div class="scoreFactorBar"><div class="scoreFactorFill" id="sf0" style="width:0%"></div></div><span class="scoreFactorVal" id="sfv0">—</span></div>
+        <div class="scoreFactor"><span class="scoreFactorName" data-i18n="sfLow">Tiefton-Energie (20–150 Hz)</span><div class="scoreFactorBar"><div class="scoreFactorFill" id="sf1" style="width:0%"></div></div><span class="scoreFactorVal" id="sfv1">—</span></div>
+        <div class="scoreFactor"><span class="scoreFactorName" data-i18n="sfHarm">Harmonizität</span><div class="scoreFactorBar"><div class="scoreFactorFill" id="sf2" style="width:0%"></div></div><span class="scoreFactorVal" id="sfv2">—</span></div>
+        <div class="scoreFactor"><span class="scoreFactorName" data-i18n="sfChaos">Ring-Chaos</span><div class="scoreFactorBar"><div class="scoreFactorFill" id="sf3" style="width:0%"></div></div><span class="scoreFactorVal" id="sfv3">—</span></div>
+        <div class="scoreFactor"><span class="scoreFactorName" data-i18n="sfDyn">Dynamikumfang</span><div class="scoreFactorBar"><div class="scoreFactorFill" id="sf4" style="width:0%"></div></div><span class="scoreFactorVal" id="sfv4">—</span></div>
+      </div>
+    </div>
+    <p class="hint" data-i18n="scoreHint">0–100 aus fünf FFT-Faktoren. Hoher Wert = definierter Attack, klare Partialtöne, wenig Rauschen.</p>
+  </div>
+ 
+  <!-- Wellenform -->
   <div class="card">
     <label data-i18n="waveformLabel">Wellenform (Zeitbereich)</label>
     <canvas id="waveCanvas" height="120"></canvas>
   </div>
-
+ 
+  <!-- Spektrum -->
   <div class="card">
     <label data-i18n="spectrumLabel">Frequenzspektrum (mit Gruppen-Markern)</label>
     <canvas id="freqCanvas" height="160"></canvas>
   </div>
-
+ 
+  <!-- Hit-Log -->
   <div class="card">
     <label data-i18n="hitsLabel">Erkannte Anschläge (letzte 10)</label>
     <table>
-      <thead><tr><th>#</th><th data-i18n="thTime">Zeit</th><th data-i18n="thGroups">Gruppen</th><th data-i18n="thYin">YIN</th><th data-i18n="thLevel">Pegel</th></tr></thead>
-      <tbody id="hitLog"><tr><td colspan="5" style="color: var(--muted);" data-i18n="noHitsYet">Noch keine Anschläge erkannt.</td></tr></tbody>
+      <thead><tr>
+        <th>#</th>
+        <th data-i18n="thTime">Zeit</th>
+        <th data-i18n="thGroups">Gruppen</th>
+        <th data-i18n="thYin">YIN</th>
+        <th data-i18n="thLevel">Pegel</th>
+        <th data-i18n="thScore">Score</th>
+      </tr></thead>
+      <tbody id="hitLog"><tr><td colspan="6" style="color: var(--muted);" data-i18n="noHitsYet">Noch keine Anschläge erkannt.</td></tr></tbody>
     </table>
   </div>
 </main>
-
+ 
 <script>
 (function () {
-  const deviceSelect = document.getElementById('deviceSelect');
-  const startBtn = document.getElementById('startBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const freezeBtn = document.getElementById('freezeBtn');
-  const statusDot = document.getElementById('statusDot');
-  const statusText = document.getElementById('statusText');
-  const pitchDisplay = document.getElementById('pitchDisplay');
+  // ── DOM-Referenzen ──────────────────────────────────────────────────────────
+  const deviceSelect  = document.getElementById('deviceSelect');
+  const startBtn      = document.getElementById('startBtn');
+  const stopBtn       = document.getElementById('stopBtn');
+  const freezeBtn     = document.getElementById('freezeBtn');
+  const clearBtn      = document.getElementById('clearBtn');
+  const exportBtn     = document.getElementById('exportBtn');
+  const statusDot     = document.getElementById('statusDot');
+  const statusText    = document.getElementById('statusText');
+  const pitchDisplay  = document.getElementById('pitchDisplay');
   const stableDisplay = document.getElementById('stableDisplay');
-  const yinDisplay = document.getElementById('yinDisplay');
-  const peakList = document.getElementById('peakList');
-  const meterBar = document.getElementById('meterBar');
-  const waveCanvas = document.getElementById('waveCanvas');
-  const freqCanvas = document.getElementById('freqCanvas');
-  const hitLog = document.getElementById('hitLog');
-  const waveCtx = waveCanvas.getContext('2d');
-  const freqCtx = freqCanvas.getContext('2d');
-  const langDeBtn = document.getElementById('langDe');
-  const langEnBtn = document.getElementById('langEn');
-
+  const yinDisplay    = document.getElementById('yinDisplay');
+  const peakList      = document.getElementById('peakList');
+  const meterBar      = document.getElementById('meterBar');
+  const meterLabel    = document.getElementById('meterLabel');
+  const waveCanvas    = document.getElementById('waveCanvas');
+  const freqCanvas    = document.getElementById('freqCanvas');
+  const hitLog        = document.getElementById('hitLog');
+  const scoreDisplay  = document.getElementById('scoreDisplay');
+  const langDeBtn     = document.getElementById('langDe');
+  const langEnBtn     = document.getElementById('langEn');
+  const metaDrum      = document.getElementById('metaDrum');
+  const metaHead      = document.getElementById('metaHead');
+  const metaNotes     = document.getElementById('metaNotes');
+  const waveCtx       = waveCanvas.getContext('2d');
+  const freqCtx       = freqCanvas.getContext('2d');
+ 
+  // ── Sterne-Bewertung ───────────────────────────────────────────────────────
+  let starValue = 0;
+  document.querySelectorAll('#starRating span').forEach(s => {
+    s.addEventListener('click', () => {
+      starValue = parseInt(s.getAttribute('data-v'));
+      document.querySelectorAll('#starRating span').forEach(x => {
+        x.classList.toggle('active', parseInt(x.getAttribute('data-v')) <= starValue);
+      });
+    });
+    s.addEventListener('mouseover', () => {
+      const v = parseInt(s.getAttribute('data-v'));
+      document.querySelectorAll('#starRating span').forEach(x =>
+        x.classList.toggle('active', parseInt(x.getAttribute('data-v')) <= v));
+    });
+    s.addEventListener('mouseout', () => {
+      document.querySelectorAll('#starRating span').forEach(x =>
+        x.classList.toggle('active', parseInt(x.getAttribute('data-v')) <= starValue));
+    });
+  });
+ 
+  // ── Übersetzungen ──────────────────────────────────────────────────────────
   const TT = {
     de: {
       eyebrow: 'Diagnose-Werkzeug', title: 'Mikrofon-Test',
       sub: 'Prüft ein Mikrofon-Setup, bevor es in Fellton zum Einsatz kommt. Die Auswertung nutzt dieselbe Spektralanalyse wie der Rechner, sodass sich die Werte direkt vergleichen lassen — zusätzlich mit Verlauf über die letzten Anschläge.',
       deviceLabel: 'Eingabegerät', placeholderOption: 'Erst auf "Starten" klicken…',
       startBtn: 'Starten', stopBtn: 'Stoppen', freezeBtn: 'Einfrieren', unfreezeBtn: 'Weiter',
-      notConnected: 'Nicht verbunden', liveListening: 'Live — hört zu', stopped: 'Gestoppt', frozen: 'Eingefroren', errorPrefix: 'Fehler: ',
+      clearBtn: 'Log leeren', exportBtn: 'CSV exportieren',
+      notConnected: 'Nicht verbunden', liveListening: 'Live — hört zu', stopped: 'Gestoppt',
+      frozen: 'Eingefroren', errorPrefix: 'Fehler: ',
       mainLabel: 'Stärkste Gruppe (wie im Rechner)',
       stableLabel: 'Stabil über letzte Anschläge:',
       yinLabel: 'YIN-Grundton (Vergleich):',
       groupLabel: 'Gruppen im Spektrum',
-      levelHint: 'Pegel (RMS). Je lauter/klarer der Anschlag, desto zuverlässiger die Erkennung. "Einfrieren" hält den aktuellen Wert fest.',
+      levelHint: 'Pegel (RMS). Je lauter/klarer der Anschlag, desto zuverlässiger die Erkennung.',
       waveformLabel: 'Wellenform (Zeitbereich)', spectrumLabel: 'Frequenzspektrum (mit Gruppen-Markern)',
       hitsLabel: 'Erkannte Anschläge (letzte 10)',
-      thTime: 'Zeit', thGroups: 'Gruppen', thYin: 'YIN', thLevel: 'Pegel',
+      thTime: 'Zeit', thGroups: 'Gruppen', thYin: 'YIN', thLevel: 'Pegel', thScore: 'Score',
       noHitsYet: 'Noch keine Anschläge erkannt.',
       micFallback: 'Mikrofon', locale: 'de-DE',
+      metaLabel: 'Trommel-Metadaten (für CSV-Export)',
+      metaDrumLabel: 'Trommel / Modell',
+      metaHeadLabel: 'Fell-Typ (optional)',
+      metaRatingLabel: 'Subjektive Bewertung (1–5)',
+      metaNotesLabel: 'Notizen (optional)',
+      soundScoreLabel: 'Sound Score (letzter Anschlag)',
+      sfAttack: 'Attack-Schärfe',
+      sfLow: 'Tiefton-Energie (20–150 Hz)',
+      sfHarm: 'Harmonizität',
+      sfChaos: 'Ring-Chaos',
+      sfDyn: 'Dynamikumfang',
+      scoreHint: '0–100 aus fünf FFT-Faktoren. Hoher Wert = definierter Attack, klare Partialtöne, wenig Rauschen.',
     },
     en: {
       eyebrow: 'Diagnostic Tool', title: 'Microphone Test',
       sub: 'Checks a microphone setup before using it in Fellton. The analysis uses the same spectral method as the calculator, so the values compare directly — plus a history of recent strikes.',
       deviceLabel: 'Input device', placeholderOption: 'Click "Start" first…',
       startBtn: 'Start', stopBtn: 'Stop', freezeBtn: 'Freeze', unfreezeBtn: 'Resume',
-      notConnected: 'Not connected', liveListening: 'Live — listening', stopped: 'Stopped', frozen: 'Frozen', errorPrefix: 'Error: ',
+      clearBtn: 'Clear log', exportBtn: 'Export CSV',
+      notConnected: 'Not connected', liveListening: 'Live — listening', stopped: 'Stopped',
+      frozen: 'Frozen', errorPrefix: 'Error: ',
       mainLabel: 'Strongest group (same as calculator)',
       stableLabel: 'Stable across recent strikes:',
       yinLabel: 'YIN fundamental (for comparison):',
       groupLabel: 'Groups in spectrum',
-      levelHint: 'Level (RMS). The louder/clearer the hit, the more reliable the detection. "Freeze" holds the current value.',
+      levelHint: 'Level (RMS). The louder/clearer the hit, the more reliable the detection.',
       waveformLabel: 'Waveform (time domain)', spectrumLabel: 'Frequency spectrum (with group markers)',
       hitsLabel: 'Detected hits (last 10)',
-      thTime: 'Time', thGroups: 'Groups', thYin: 'YIN', thLevel: 'Level',
+      thTime: 'Time', thGroups: 'Groups', thYin: 'YIN', thLevel: 'Level', thScore: 'Score',
       noHitsYet: 'No hits detected yet.',
       micFallback: 'Microphone', locale: 'en-US',
+      metaLabel: 'Drum metadata (for CSV export)',
+      metaDrumLabel: 'Drum / Model',
+      metaHeadLabel: 'Head type (optional)',
+      metaRatingLabel: 'Subjective rating (1–5)',
+      metaNotesLabel: 'Notes (optional)',
+      soundScoreLabel: 'Sound Score (last hit)',
+      sfAttack: 'Attack sharpness',
+      sfLow: 'Low-freq energy (20–150 Hz)',
+      sfHarm: 'Harmonicity',
+      sfChaos: 'Ring chaos',
+      sfDyn: 'Dynamic range',
+      scoreHint: '0–100 from five FFT factors. High = defined attack, clear partials, low noise.',
     },
   };
   let lang = 'de';
-
+ 
   function applyLang() {
     const dict = TT[lang];
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -176,42 +323,45 @@
       if (dict[key] !== undefined) el.textContent = dict[key];
     });
     langDeBtn.style.background = lang === 'de' ? 'var(--gold)' : 'none';
-    langDeBtn.style.color = lang === 'de' ? 'var(--bg)' : 'var(--gold)';
+    langDeBtn.style.color     = lang === 'de' ? 'var(--bg)'   : 'var(--gold)';
     langEnBtn.style.background = lang === 'en' ? 'var(--gold)' : 'none';
-    langEnBtn.style.color = lang === 'en' ? 'var(--bg)' : 'var(--gold)';
+    langEnBtn.style.color     = lang === 'en' ? 'var(--bg)'   : 'var(--gold)';
     freezeBtn.textContent = frozen ? dict.unfreezeBtn : dict.freezeBtn;
     if (!audioCtx) statusText.textContent = dict.notConnected;
     else if (frozen) statusText.textContent = dict.frozen;
     else statusText.textContent = dict.liveListening;
     if (hits.length === 0) renderHitLog();
   }
-
+ 
   langDeBtn.addEventListener('click', () => { lang = 'de'; applyLang(); });
   langEnBtn.addEventListener('click', () => { lang = 'en'; applyLang(); });
-
+ 
+  // ── Audio-State ────────────────────────────────────────────────────────────
   let audioCtx = null, analyser = null, source = null, stream = null;
   let rafId = null;
   let onsetActive = false;
   let hits = [];
   let frozen = false;
-  let history = [];          // Gruppen der letzten Anschläge (wie im Rechner)
+  let history = [];        // Gruppen der letzten N Anschläge
+  const HISTORY_SIZE = 6;  // erhöht von 4 → 6
   const MIN_HZ = 40, MAX_HZ = 500;
-  const FFT_SIZE = 32768;    // identisch zum Rechner
-
+  const FFT_SIZE = 32768;
+ 
+  // ── Canvas-Skalierung ──────────────────────────────────────────────────────
   function fitCanvas(canvas) {
     const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * devicePixelRatio;
+    canvas.width  = rect.width  * devicePixelRatio;
     canvas.height = rect.height * devicePixelRatio;
   }
-
-  // YIN — nur noch als Vergleichswert (findet den Trommel-Grundton, nicht die Lug-Frequenz)
+ 
+  // ── YIN — nur noch als Vergleichswert ─────────────────────────────────────
   function detectPitch(buf, sampleRate, threshold = 0.15) {
     const SIZE = Math.min(buf.length, 4096);
     const halfSize = Math.floor(SIZE / 2);
     let rms = 0;
     for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
     rms = Math.sqrt(rms / SIZE);
-    if (rms < 0.01) return { freq: -1, rms };
+    if (rms < 0.005) return { freq: -1, rms };
     const diff = new Float32Array(halfSize);
     for (let tau = 1; tau < halfSize; tau++) {
       let sum = 0;
@@ -247,12 +397,20 @@
     if (freq < MIN_HZ || freq > MAX_HZ) return { freq: -1, rms };
     return { freq, rms };
   }
-
-  // Spektralanalyse — identisch zur Logik im Rechner
+ 
+  // ── RMS aus Float-Array (für Snapshot-Pegel) ───────────────────────────────
+  function calcRMS(buf) {
+    let sum = 0;
+    const n = Math.min(buf.length, 8192);
+    for (let i = 0; i < n; i++) sum += buf[i] * buf[i];
+    return Math.sqrt(sum / n);
+  }
+ 
+  // ── Spektralanalyse — identisch zum Rechner ────────────────────────────────
   function analyzeSpectrum(freqDb, sampleRate, fftSize) {
     const binHz = sampleRate / fftSize;
     const startBin = Math.max(2, Math.floor(MIN_HZ / binHz));
-    const endBin = Math.min(freqDb.length - 2, Math.ceil(MAX_HZ / binHz));
+    const endBin   = Math.min(freqDb.length - 2, Math.ceil(MAX_HZ / binHz));
     if (endBin <= startBin) return null;
     let maxDb = -Infinity;
     for (let i = startBin; i <= endBin; i++) if (freqDb[i] > maxDb) maxDb = freqDb[i];
@@ -270,7 +428,6 @@
       }
     }
     if (peaks.length === 0) return null;
-    // Gruppierungsabstand skaliert mit der Frequenz (6 %, mindestens 8 Hz)
     const groupGap = (f) => Math.max(8, f * 0.06);
     const subsets = [];
     let current = [peaks[0]];
@@ -280,11 +437,91 @@
     }
     subsets.push(current);
     const best = (arr) => arr.reduce((m, p) => p.db > m.db ? p : m);
-    const groups = subsets.map((s) => ({ freq: best(s).freq, db: best(s).db }));
+    const groups = subsets.map(s => ({ freq: best(s).freq, db: best(s).db }));
     return { groups };
   }
-
-  // Stabilster wiederkehrender Ton über die letzten Anschläge — identisch zum Rechner
+ 
+  // ── Sound Score — 5 Faktoren ───────────────────────────────────────────────
+  function computeSoundScore(timeBuf, freqDb, sampleRate, fftSize) {
+    const binHz = sampleRate / fftSize;
+ 
+    // 1. Attack-Schärfe: Peak-RMS in den ersten 20ms vs. Rest
+    const attackSamples = Math.floor(sampleRate * 0.02);
+    let peakRMS = 0, tailRMS = 0;
+    for (let i = 0; i < Math.min(attackSamples, timeBuf.length); i++) peakRMS += timeBuf[i] * timeBuf[i];
+    for (let i = attackSamples; i < timeBuf.length; i++) tailRMS += timeBuf[i] * timeBuf[i];
+    peakRMS = Math.sqrt(peakRMS / Math.min(attackSamples, timeBuf.length));
+    tailRMS = Math.sqrt(tailRMS / Math.max(1, timeBuf.length - attackSamples));
+    const attackScore = Math.min(100, tailRMS > 0.0001 ? (peakRMS / tailRMS) * 10 : 100);
+ 
+    // 2. Tiefton-Energie (20–150 Hz)
+    const lowStart = Math.max(1, Math.floor(20  / binHz));
+    const lowEnd   = Math.min(freqDb.length - 1, Math.ceil(150 / binHz));
+    let lowSum = 0, totalSum = 0;
+    for (let i = 1; i < freqDb.length; i++) {
+      const v = Math.pow(10, freqDb[i] / 20);
+      totalSum += v;
+      if (i >= lowStart && i <= lowEnd) lowSum += v;
+    }
+    const lowScore = Math.min(100, totalSum > 0 ? (lowSum / totalSum) * 400 : 0);
+ 
+    // 3. Harmonizität: Verhältnis Peak-Energie zu Umgebungsrauschen im 40–500Hz Bereich
+    const harmStart = Math.max(2, Math.floor(40  / binHz));
+    const harmEnd   = Math.min(freqDb.length - 2, Math.ceil(500 / binHz));
+    let peakEnergy = 0, noiseEnergy = 0, peakCount = 0;
+    for (let i = harmStart; i <= harmEnd; i++) {
+      const v = freqDb[i];
+      if (v > freqDb[i-1] && v >= freqDb[i+1]) { peakEnergy += Math.pow(10, v/20); peakCount++; }
+      else noiseEnergy += Math.pow(10, v/20);
+    }
+    const harmScore = Math.min(100, noiseEnergy > 0 && peakCount > 0 ? Math.log10(peakEnergy / noiseEnergy) * 30 : 0);
+ 
+    // 4. Ring-Chaos (invertiert): Varianz der spektralen Energie über 300ms
+    // → Annäherung: Streuung der stärksten Peaks im Spektrum
+    const allPeaks = [];
+    for (let i = harmStart; i <= harmEnd; i++) {
+      if (freqDb[i] > freqDb[i-1] && freqDb[i] >= freqDb[i+1]) allPeaks.push(freqDb[i]);
+    }
+    let chaosPenalty = 0;
+    if (allPeaks.length > 1) {
+      const mean = allPeaks.reduce((a,b) => a+b, 0) / allPeaks.length;
+      const variance = allPeaks.reduce((a,b) => a + (b-mean)**2, 0) / allPeaks.length;
+      chaosPenalty = Math.min(100, Math.sqrt(variance) * 2);
+    }
+    const chaosScore = Math.max(0, 100 - chaosPenalty);
+ 
+    // 5. Dynamikumfang: Verhältnis stärkstes Peak zu Grundrauschen
+    let maxVal = -Infinity, minVal = Infinity;
+    for (let i = harmStart; i <= harmEnd; i++) {
+      if (freqDb[i] > maxVal) maxVal = freqDb[i];
+      if (freqDb[i] < minVal) minVal = freqDb[i];
+    }
+    const dynScore = Math.min(100, Math.max(0, (maxVal - minVal) * 1.5));
+ 
+    const factors = [attackScore, lowScore, harmScore, chaosScore, dynScore];
+    const weights = [0.25, 0.15, 0.25, 0.20, 0.15];
+    const total = Math.round(factors.reduce((s, f, i) => s + f * weights[i], 0));
+    return { total, factors };
+  }
+ 
+  function renderScore(score) {
+    if (!score) {
+      scoreDisplay.textContent = '—';
+      ['sf0','sf1','sf2','sf3','sf4'].forEach((id,i) => {
+        document.getElementById(id).style.width = '0%';
+        document.getElementById('sfv' + i).textContent = '—';
+      });
+      return;
+    }
+    scoreDisplay.textContent = score.total;
+    score.factors.forEach((f, i) => {
+      const pct = Math.round(f);
+      document.getElementById('sf' + i).style.width = pct + '%';
+      document.getElementById('sfv' + i).textContent = pct;
+    });
+  }
+ 
+  // ── Stabilster Peak ────────────────────────────────────────────────────────
   function pickStablePeak(hist, tolPct = 0.04) {
     const all = [];
     hist.forEach(gs => gs.forEach(f => all.push(f)));
@@ -311,7 +548,8 @@
     }
     return bestFreq;
   }
-
+ 
+  // ── Geräte ─────────────────────────────────────────────────────────────────
   async function populateDevices() {
     const prev = deviceSelect.value;
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -331,7 +569,8 @@
       if (activeId && mics.some(d => d.deviceId === activeId)) deviceSelect.value = activeId;
     }
   }
-
+ 
+  // ── Start / Stop ───────────────────────────────────────────────────────────
   async function start() {
     try {
       const deviceId = deviceSelect.value || undefined;
@@ -343,7 +582,6 @@
       };
       stream = await navigator.mediaDevices.getUserMedia(constraints);
       await populateDevices();
-
       const Ctx = window.AudioContext || window.webkitAudioContext;
       audioCtx = new Ctx();
       source = audioCtx.createMediaStreamSource(stream);
@@ -351,27 +589,27 @@
       analyser.fftSize = FFT_SIZE;
       analyser.smoothingTimeConstant = 0;
       source.connect(analyser);
-
       fitCanvas(waveCanvas);
       fitCanvas(freqCanvas);
-
       statusDot.classList.add('live');
       statusText.textContent = TT[lang].liveListening;
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
+      startBtn.disabled  = true;
+      stopBtn.disabled   = false;
       freezeBtn.disabled = false;
+      clearBtn.disabled  = false;
+      exportBtn.disabled = false;
       deviceSelect.disabled = true;
       frozen = false;
       freezeBtn.textContent = TT[lang].freezeBtn;
-      hits = [];
-      history = [];
+      hits = []; history = [];
       renderHitLog();
+      renderScore(null);
       loop();
     } catch (err) {
       statusText.textContent = TT[lang].errorPrefix + err.message;
     }
   }
-
+ 
   function stop() {
     if (rafId) cancelAnimationFrame(rafId);
     if (stream) stream.getTracks().forEach(t => t.stop());
@@ -379,28 +617,63 @@
     audioCtx = null; analyser = null; source = null; stream = null;
     statusDot.classList.remove('live');
     statusText.textContent = TT[lang].stopped;
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
+    startBtn.disabled  = false;
+    stopBtn.disabled   = true;
     freezeBtn.disabled = true;
+    clearBtn.disabled  = true;
+    exportBtn.disabled = true;
     deviceSelect.disabled = false;
     pitchDisplay.textContent = '— Hz';
     stableDisplay.textContent = '—';
     yinDisplay.textContent = '—';
     peakList.textContent = '—';
     meterBar.style.width = '0%';
+    meterLabel.textContent = '—';
     onsetActive = false;
     frozen = false;
   }
-
+ 
   freezeBtn.addEventListener('click', () => {
     frozen = !frozen;
     freezeBtn.textContent = frozen ? TT[lang].unfreezeBtn : TT[lang].freezeBtn;
     statusText.textContent = frozen ? TT[lang].frozen : TT[lang].liveListening;
   });
-
+ 
+  clearBtn.addEventListener('click', () => {
+    hits = []; history = [];
+    renderHitLog();
+    renderScore(null);
+    stableDisplay.textContent = '—';
+  });
+ 
+  // ── CSV-Export ─────────────────────────────────────────────────────────────
+  exportBtn.addEventListener('click', () => {
+    if (hits.length === 0) return;
+    const drum   = metaDrum.value.trim()  || '—';
+    const head   = metaHead.value.trim()  || '—';
+    const notes  = metaNotes.value.trim() || '—';
+    const rating = starValue || '—';
+    const header = 'Nr,Zeit,Gruppen_Hz,YIN_Hz,Pegel_pct,SoundScore,Trommel,Fell,Bewertung,Notizen';
+    const rows = hits.map((h, i) =>
+      [i+1, h.time, '"' + h.groups + '"', h.yin > 0 ? h.yin.toFixed(1) : '',
+       h.rms.toFixed(3), h.score != null ? h.score : '',
+       '"' + drum + '"', '"' + head + '"', rating, '"' + notes.replace(/"/g,'""') + '"'
+      ].join(',')
+    );
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = 'fellton-mictest-' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+ 
+  // ── Hit-Log ────────────────────────────────────────────────────────────────
   function renderHitLog() {
     if (hits.length === 0) {
-      hitLog.innerHTML = `<tr><td colspan="5" style="color: var(--muted);">${TT[lang].noHitsYet}</td></tr>`;
+      hitLog.innerHTML = `<tr><td colspan="6" style="color: var(--muted);">${TT[lang].noHitsYet}</td></tr>`;
       return;
     }
     hitLog.innerHTML = hits.slice(-10).reverse().map((h, i) => `
@@ -409,11 +682,13 @@
         <td>${h.time}</td>
         <td style="color: var(--gold);">${h.groups}</td>
         <td>${h.yin > 0 ? h.yin.toFixed(1) : '—'}</td>
-        <td>${(h.rms * 100).toFixed(0)}%</td>
+        <td>${(h.rms * 100).toFixed(1)}%</td>
+        <td>${h.score != null ? h.score : '—'}</td>
       </tr>
     `).join('');
   }
-
+ 
+  // ── Zeichnen ───────────────────────────────────────────────────────────────
   function drawWave(buf) {
     const w = waveCanvas.width, h = waveCanvas.height;
     waveCtx.clearRect(0, 0, w, h);
@@ -429,7 +704,7 @@
     }
     waveCtx.stroke();
   }
-
+ 
   function drawFreq(freqData, sampleRate, fftSize, groups) {
     const w = freqCanvas.width, h = freqCanvas.height;
     freqCtx.clearRect(0, 0, w, h);
@@ -438,7 +713,6 @@
     const maxBin = Math.min(freqData.length, Math.ceil(displayMax / binHz));
     const dpr = devicePixelRatio;
     const barW = Math.max(1, w / maxBin);
-
     for (let i = 1; i < maxBin; i++) {
       const v = freqData[i] / 255;
       const x = ((i * binHz) / displayMax) * w;
@@ -446,7 +720,6 @@
       freqCtx.fillStyle = `rgba(201,161,90,${0.25 + v * 0.6})`;
       freqCtx.fillRect(x, h - 18 * dpr - barH, barW, barH);
     }
-
     freqCtx.fillStyle = '#a8977b';
     freqCtx.font = `${11 * dpr}px ui-monospace, monospace`;
     freqCtx.textAlign = 'center';
@@ -454,57 +727,56 @@
       const x = (f / displayMax) * w;
       freqCtx.strokeStyle = 'rgba(168,151,123,0.25)';
       freqCtx.lineWidth = 1;
-      freqCtx.beginPath();
-      freqCtx.moveTo(x, 0);
-      freqCtx.lineTo(x, h - 18 * dpr);
-      freqCtx.stroke();
+      freqCtx.beginPath(); freqCtx.moveTo(x, 0); freqCtx.lineTo(x, h - 18 * dpr); freqCtx.stroke();
       freqCtx.fillText(f + ' Hz', x, h - 4 * dpr);
     }
-
     if (groups && groups.length) {
       groups.forEach((g, idx) => {
         const x = (g.freq / displayMax) * w;
         freqCtx.strokeStyle = idx === 0 ? '#7fa593' : '#c1666b';
         freqCtx.lineWidth = 1.5 * dpr;
-        freqCtx.beginPath();
-        freqCtx.moveTo(x, 0);
-        freqCtx.lineTo(x, h - 18 * dpr);
-        freqCtx.stroke();
+        freqCtx.beginPath(); freqCtx.moveTo(x, 0); freqCtx.lineTo(x, h - 18 * dpr); freqCtx.stroke();
         freqCtx.fillStyle = idx === 0 ? '#7fa593' : '#c1666b';
         freqCtx.fillText(g.freq.toFixed(0), x, 12 * dpr);
       });
     }
   }
-
+ 
+  // ── Haupt-Loop ─────────────────────────────────────────────────────────────
   function loop() {
     if (!analyser) return;
     if (frozen) { rafId = requestAnimationFrame(loop); return; }
-
+ 
     const timeBuf = new Float32Array(analyser.fftSize);
     analyser.getFloatTimeDomainData(timeBuf);
     const freqByte = new Uint8Array(analyser.frequencyBinCount);
     analyser.getByteFrequencyData(freqByte);
     const freqDb = new Float32Array(analyser.frequencyBinCount);
     analyser.getFloatFrequencyData(freqDb);
-
-    const res = analyzeSpectrum(freqDb, audioCtx.sampleRate, analyser.fftSize);
+ 
+    const res    = analyzeSpectrum(freqDb, audioCtx.sampleRate, analyser.fftSize);
     const groups = res ? res.groups : [];
-
+ 
     drawWave(timeBuf);
     drawFreq(freqByte, audioCtx.sampleRate, analyser.fftSize, groups);
-
-    const { freq: yinFreq, rms } = detectPitch(timeBuf, audioCtx.sampleRate);
-    meterBar.style.width = (Math.min(1, rms * 6) * 100).toFixed(0) + '%';
-
+ 
+    // RMS aus dem Zeitbereich (direkt, nicht via YIN)
+    const rmsLive = calcRMS(timeBuf);
+    const pct = (Math.min(1, rmsLive * 15) * 100);
+    meterBar.style.width = pct.toFixed(1) + '%';
+    meterLabel.textContent = (rmsLive * 100).toFixed(2) + '% RMS';
+ 
+    const { freq: yinFreq } = detectPitch(timeBuf, audioCtx.sampleRate);
+ 
     if (groups.length) {
       const strongest = groups.reduce((m, g) => g.db > m.db ? g : m);
       pitchDisplay.textContent = strongest.freq.toFixed(1) + ' Hz';
       peakList.textContent = groups.map(g => g.freq.toFixed(0)).join(' · ') + ' Hz';
     }
     if (yinFreq > 0) yinDisplay.textContent = yinFreq.toFixed(1) + ' Hz';
-
-    // Anschlag-Erkennung (Schwellen wie im Rechner)
-    if (!onsetActive && rms > 0.03) {
+ 
+    // Onset-Erkennung — abgesenkte Schwellen für schwächere Mikrofone
+    if (!onsetActive && rmsLive > 0.015) {
       onsetActive = true;
       setTimeout(() => {
         if (!analyser) return;
@@ -512,45 +784,51 @@
         analyser.getFloatTimeDomainData(t2);
         const d2 = new Float32Array(analyser.frequencyBinCount);
         analyser.getFloatFrequencyData(d2);
-        const snap = analyzeSpectrum(d2, audioCtx.sampleRate, analyser.fftSize);
-        const settled = detectPitch(t2, audioCtx.sampleRate);
+ 
+        const snap   = analyzeSpectrum(d2, audioCtx.sampleRate, analyser.fftSize);
+        const yinSnap = detectPitch(t2, audioCtx.sampleRate);
+        // RMS direkt aus Snapshot berechnen — nicht aus YIN
+        const snapRMS = calcRMS(t2);
+ 
         if (snap && snap.groups.length) {
           const gs = snap.groups.map(g => g.freq);
           history.push(gs);
-          if (history.length > 4) history.shift();
+          if (history.length > HISTORY_SIZE) history.shift();
           const stable = pickStablePeak(history);
           stableDisplay.textContent = stable != null ? stable.toFixed(1) + ' Hz' : '—';
+ 
+          const score = computeSoundScore(t2, d2, audioCtx.sampleRate, analyser.fftSize);
+          renderScore(score);
+ 
           hits.push({
-            time: new Date().toLocaleTimeString(TT[lang].locale),
+            time:   new Date().toLocaleTimeString(TT[lang].locale),
             groups: gs.map(f => f.toFixed(0)).join(' · '),
-            yin: settled.freq,
-            rms: settled.rms,
+            yin:    yinSnap.freq,
+            rms:    snapRMS,       // ← Snapshot-RMS, nicht YIN-RMS
+            score:  score.total,
           });
           renderHitLog();
         }
-      }, 450); // gleiches Zeitfenster wie im Rechner
-    } else if (onsetActive && rms < 0.02) {
+      }, 450);
+    } else if (onsetActive && rmsLive < 0.010) {
       onsetActive = false;
     }
-
+ 
     rafId = requestAnimationFrame(loop);
   }
-
+ 
   startBtn.addEventListener('click', start);
   stopBtn.addEventListener('click', stop);
-
   window.addEventListener('resize', () => {
     if (audioCtx) { fitCanvas(waveCanvas); fitCanvas(freqCanvas); }
   });
-
   navigator.mediaDevices.enumerateDevices().then(devices => {
     const mics = devices.filter(d => d.kind === 'audioinput');
     if (mics.length && mics[0].label) populateDevices();
   }).catch(() => {});
-
   applyLang();
 })();
 </script>
-
 </body>
 </html>
+ 
