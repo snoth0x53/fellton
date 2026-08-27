@@ -165,10 +165,28 @@ mindestens 8 Hz), weil die Partialtöne nach oben hin enger zusammenrücken. Ang
 wird die kräftigste Gruppe des jeweiligen Anschlags. Parabel-Interpolation verfeinert
 die Auflösung auf unter 1 Hz.
 
+### Fundamentalton-Erkennung via Membranmoden
+
+Ein Fell schwingt in mehreren überlagerten Moden gleichzeitig. Die höheren Moden
+können im Spektrum lauter erscheinen als der eigentliche Grundton – besonders bei
+Snares, wo die zweite Mode oft dominiert. Ein einfaches „stärkste Gruppe nehmen"
+liefert dann den falschen Wert.
+
+Fellton nutzt deshalb die bekannten Frequenzverhältnisse kreisförmiger Membranen
+als Heuristik: (1,1) ≈ 1,59× → (2,1) ≈ 2,14× → (0,2) ≈ 2,30× → (3,1) ≈ 2,65×
+der Grundmode. Der Algorithmus wählt die tiefste Spektralgruppe, zu der mindestens
+eine Obermode in einem dieser Verhältnisse (±8 %) existiert. Ist keine Bestätigung
+auffindbar, gewinnt die tiefste Gruppe als Fallback.
+
+Das ist eine praktische Näherung, keine akustische Messung – reale Felle weichen
+durch Kesselkopplung, ungleichmäßige Spannung und Dämpfung von den Idealwerten ab.
+In der Praxis liefert die Methode aber deutlich stabilere Ergebnisse als die reine
+Peakauswahl.
+
 Zusätzliche Maßnahmen:
 
 - **Plausible Frequenzbereiche je Trommelart:** Bassdrum 30–160 Hz, Toms 50–350 Hz,
-  Snare 50–450 Hz
+  Snare 80–450 Hz
 - **Filter** (siehe oben) für den kritischen Hochtonbereich
 
 Ein Vergleich gegen ein Hardware-Stimmgerät ergab im Normalbereich sehr ähnliche
