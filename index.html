@@ -9,10 +9,121 @@
 <script src="lib/tailwind.js"></script>
 <style>
   body { margin: 0; background: #1a140d; }
+  .help-panel {
+    position: fixed; top: 0; right: 0; width: min(480px, 100vw); height: 100vh;
+    background: #211910; border-left: 1px solid #3a2c1a;
+    overflow-y: auto; z-index: 1000; padding: 24px;
+    transform: translateX(100%); transition: transform 0.25s ease;
+    font-family: Georgia, 'Iowan Old Style', serif;
+    color: #e8dcc4; font-size: 14px; line-height: 1.7;
+  }
+  .help-panel.open { transform: translateX(0); }
+  .help-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999;
+  }
+  .help-overlay.open { display: block; }
+  .help-panel h2 { font-size: 20px; color: #c9a15a; margin: 0 0 16px; font-family: 'Playfair Display', Georgia, serif; }
+  .help-panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #c9a15a; margin: 24px 0 8px; border-top: 1px solid #3a2c1a; padding-top: 16px; }
+  .help-panel p { margin: 0 0 10px; color: #a8977b; }
+  .help-panel ul { margin: 0 0 10px; padding-left: 18px; color: #a8977b; }
+  .help-panel li { margin-bottom: 4px; }
+  .help-panel strong { color: #e8dcc4; font-weight: normal; }
+  .help-panel a { color: #c9a15a; }
+  .help-close {
+    position: sticky; top: 0; float: right; margin: -4px -4px 8px 8px;
+    background: #3a2c1a; border: none; color: #c9a15a; cursor: pointer;
+    width: 32px; height: 32px; border-radius: 50%; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .help-close:hover { background: #c9a15a; color: #1a140d; }
 </style>
 </head>
 <body>
 <div id="root"></div>
+
+<!-- Hilfe-Panel -->
+<div class="help-overlay" id="helpOverlay" onclick="closeHelp()"></div>
+<div class="help-panel no-print" id="helpPanel">
+  <button class="help-close" onclick="closeHelp()">×</button>
+  <h2>📖 Fellton – Anleitung</h2>
+
+  <h3>Erste Schritte</h3>
+  <p>Oben links auf <strong>„Geräte laden"</strong> klicken, Mikrofon-Erlaubnis bestätigen, dann das Mikrofon aus der Liste wählen.</p>
+
+  <h3>Set benennen</h3>
+  <p>Das Textfeld neben <strong>„Set:"</strong> benennt das Kit (z. B. „Rogers XP8"). Der Name erscheint auf der PDF.</p>
+
+  <h3>Trommel einrichten</h3>
+  <ul>
+    <li><strong>Typ</strong> — Bass Drum, Tom, Floor Tom oder Snare</li>
+    <li><strong>Ø (")</strong> — Durchmesser in Zoll</li>
+    <li><strong>Lugs</strong> — Anzahl Spannschrauben (bestimmt Kreuz-Stimmreihenfolge)</li>
+    <li><strong>Grundton + Oktave</strong> — gewünschte Tonhöhe, Basis aller Berechnungen</li>
+  </ul>
+
+  <h3>Resonance-Modus (Toms / Bassdrum)</h3>
+  <ul>
+    <li><strong>Maximum (Unisono)</strong> — beide Felle gleich, volles Sustain</li>
+    <li><strong>High</strong> — leichtes Intervall, für Live gut geeignet</li>
+    <li><strong>Medium</strong> — deutlicheres Intervall, klarerer Attack</li>
+    <li><strong>Low</strong> — größtes Intervall, kürzestes Sustain</li>
+    <li><strong>Profi-Durchschnitt</strong> — empirisch aus 90+ Artist-Tunings</li>
+  </ul>
+  <p>Mit <strong>„Höheres Fell"</strong> lässt sich festlegen ob Schlag- oder Resonanzfell höher gestimmt ist — das tauscht die berechneten Frequenzen.</p>
+
+  <h3>Snare-Intervall</h3>
+  <p>Statt Resonance-Modus wählt man das Intervall zwischen Reso- und Schlagfell: Quinte (Standard), Quarte, Terz, Unisono oder Profi-Durchschnitt (n=22). <strong>Snare immer mit ausgehängtem Teppich messen.</strong></p>
+
+  <h3>Lug-für-Lug stimmen</h3>
+  <p>🎤-Button startet die Messung, nochmal drücken stoppt sie.</p>
+  <ul>
+    <li><strong>Nah am Lug (2–3 cm vom Rand)</strong> → Lug-Frequenz dieser Schraube</li>
+    <li><strong>Mittig</strong> → Grundton der ganzen Trommel</li>
+  </ul>
+  <p>Der <strong>Lug-Ring</strong> zeigt die Kreuz-Stimmreihenfolge: immer zum gegenüberliegenden Lug, dann eine weiter.</p>
+  <p><strong>Ablauf:</strong> Trommel umdrehen — zu stimmendes Fell oben, das andere auf weicher Unterlage. Lugs in Kreuz-Reihenfolge anschlagen, Schrauben anpassen bis die Anzeige grün wird. Dann umdrehen und zweites Fell genauso.</p>
+
+  <h3>Filter</h3>
+  <p>Ab ~300 Hz wird die Messung ungenauer. Lösung: erst korrekte Messung machen, dann <strong>Filter</strong> drücken. Ab dann kommen nur noch Frequenzen im Bereich ±1,5 Halbtöne infrage. Nochmal drücken schaltet aus. Bei Stimmungsänderungen neu setzen.</p>
+
+  <h3>Kalibrieren</h3>
+  <p><strong>Schritt 1:</strong> Beide Felle auf dieselbe Lug-Frequenz stimmen (Unisono).</p>
+  <p><strong>Schritt 2:</strong> Trommel auf Ständer, mittig anschlagen → Grundton messen.</p>
+  <p><strong>Schritt 3:</strong> „+ Kalibrieren" öffnen, Lug-Frequenz und Grundton eintragen, <strong>Übernehmen</strong> drücken. Fellton rechnet ab jetzt mit dem individuellen Koeffizienten dieser Trommel.</p>
+
+  <h3>Eigenes Set erstellen</h3>
+  <p>Unten auf <strong>„+ Trommel hinzufügen"</strong> klicken, Typ und Einstellungen anpassen. Name oben im Trommel-Feld eintragen. Nicht mehr benötigte Trommeln über <strong>„Entfernen"</strong> löschen.</p>
+
+  <h3>Ton-Vorschau</h3>
+  <p>▶ neben Schlag-/Resofell: Sinuston auf Zielfrequenz. ▶ neben Grundton: simulierter Trommelklang zur Orientierung.</p>
+
+  <h3>Drucken / PDF</h3>
+  <p>Oben rechts <strong>🖨</strong> klicken. Der Erläuterungstext erscheint auf einer eigenen letzten Seite — im Druckdialog abwählbar.</p>
+
+  <h3>Tipps</h3>
+  <ul>
+    <li><strong>Smartphone als Mikrofon:</strong> möglichst nah an die Anschlagsstelle halten — je näher, desto stabiler die Erkennung.</li>
+    <li><strong>Externes Mikrofon</strong> (z. B. Boya By-V10 direkt ans Fell geklammert) liefert zuverlässigere Werte.</li>
+    <li><strong>Snare-Teppich aushängen</strong> — das Rasseln stört die Messung stark.</li>
+    <li><strong>Nach Fellwechsel:</strong> Filter aus, von unten hocharbeiten, dann Filter setzen.</li>
+    <li><strong>Kalibrierung lohnt sich</strong> — einmal pro Trommel/Fell macht die Berechnung deutlich genauer.</li>
+  </ul>
+
+  <h3>Mikrofon-Test-Tool</h3>
+  <p>Separates Diagnose-Werkzeug zum Prüfen des Mikrofon-Setups, mit Sound Score, CSV-Export und Mikrofon-Vergleich: <a href="mic-test.html" target="_blank">mic-test.html</a></p>
+</div>
+
+<script>
+function openHelp() {
+  document.getElementById('helpPanel').classList.add('open');
+  document.getElementById('helpOverlay').classList.add('open');
+}
+function closeHelp() {
+  document.getElementById('helpPanel').classList.remove('open');
+  document.getElementById('helpOverlay').classList.remove('open');
+}
+</script>
+
 <script>
 (() => {
   const { useState, useMemo, useRef } = React;
@@ -28,6 +139,7 @@
       defaultMic: "Standard-Mikrofon",
       micFallback: "Mikrofon",
       printButton: "\u{1F5A8} Drucken / Als PDF speichern",
+      helpButton: "? Hilfe",
       remove: "Entfernen",
       typeLabel: "Typ",
       diameterLabel: 'Ø (")',
@@ -112,6 +224,7 @@
       defaultMic: "Default microphone",
       micFallback: "Microphone",
       printButton: "\u{1F5A8} Print / Save as PDF",
+      helpButton: "? Help",
       remove: "Remove",
       typeLabel: "Type",
       diameterLabel: 'Ø (")',
@@ -305,10 +418,7 @@
     let current = [peaks[0]];
     for (let k = 1; k < peaks.length; k++) {
       if (peaks[k].freq - peaks[k - 1].freq <= groupGap(peaks[k - 1].freq)) current.push(peaks[k]);
-      else {
-        subsets.push(current);
-        current = [peaks[k]];
-      }
+      else { subsets.push(current); current = [peaks[k]]; }
     }
     subsets.push(current);
     const best = (arr) => arr.reduce((m, p) => p.db > m.db ? p : m);
@@ -321,18 +431,13 @@
     const candidates = filterHz == null ? groups : groups.filter((g) => g.freq >= filterHz / FILTER_BAND && g.freq <= filterHz * FILTER_BAND);
     if (candidates.length === 0) return null;
     if (candidates.length === 1) return candidates[0].freq;
-    // Tiefste Gruppe wählen, die durch mindestens eine Obermode bestätigt wird (±8 %).
-    // Fallback: tiefste Gruppe.
     const sorted = [...candidates].sort((a, b) => a.freq - b.freq);
     for (const cand of sorted) {
-      const confirmed = MODE_RATIOS.some(r =>
-        sorted.some(g => Math.abs(g.freq / cand.freq - r) / r < 0.08)
-      );
+      const confirmed = MODE_RATIOS.some(r => sorted.some(g => Math.abs(g.freq / cand.freq - r) / r < 0.08));
       if (confirmed) return cand.freq;
     }
     return sorted[0].freq;
   }
-  // Hz → Notenname (ohne Oktave)
   function hzToNote(hz) {
     const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
     const midi = Math.round(12 * Math.log2(hz / 440) + 69);
@@ -346,12 +451,7 @@
   };
   function getMicStream(deviceId) {
     return navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: false,
-        noiseSuppression: false,
-        autoGainControl: false,
-        deviceId: deviceId ? { exact: deviceId } : void 0
-      }
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, deviceId: deviceId ? { exact: deviceId } : void 0 }
     });
   }
   function MicMeasureButton({ targetHz, accent = "#c9a15a", deviceId = "", minHz = 20, maxHz = 1e3, labels }) {
@@ -366,67 +466,34 @@
     const filterRef = useRef(null);
     const stopListening = () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (pendingRef.current) {
-        clearTimeout(pendingRef.current);
-        pendingRef.current = null;
-      }
+      if (pendingRef.current) { clearTimeout(pendingRef.current); pendingRef.current = null; }
       if (stopFnRef.current) stopFnRef.current();
       setStatus((s) => s === "listening" ? "done" : s);
     };
     const toggleFilter = () => {
-      if (filterHz != null) {
-        setFilterHz(null);
-        filterRef.current = null;
-      } else if (result && result.value != null) {
-        setFilterHz(result.value);
-        filterRef.current = result.value;
-      }
+      if (filterHz != null) { setFilterHz(null); filterRef.current = null; }
+      else if (result && result.value != null) { setFilterHz(result.value); filterRef.current = result.value; }
     };
     const handleClick = async () => {
-      if (status === "listening") {
-        stopListening();
-        return;
-      }
-      setStatus("listening");
-      setResult(null);
-      setErrorMsg("");
-      armedRef.current = true;
+      if (status === "listening") { stopListening(); return; }
+      setStatus("listening"); setResult(null); setErrorMsg(""); armedRef.current = true;
       let stream;
-      try {
-        stream = await getMicStream(deviceId);
-      } catch (e1) {
-        if (deviceId) {
-          try {
-            stream = await getMicStream("");
-          } catch (e2) {
-            setStatus("error");
-            setErrorMsg(e2.name || String(e2));
-            return;
-          }
-        } else {
-          setStatus("error");
-          setErrorMsg(e1.name || String(e1));
-          return;
-        }
+      try { stream = await getMicStream(deviceId); }
+      catch (e1) {
+        if (deviceId) { try { stream = await getMicStream(""); } catch (e2) { setStatus("error"); setErrorMsg(e2.name || String(e2)); return; } }
+        else { setStatus("error"); setErrorMsg(e1.name || String(e1)); return; }
       }
       try {
         const Ctx = window.AudioContext || window.webkitAudioContext;
         const ctx = new Ctx();
         const source = ctx.createMediaStreamSource(stream);
-        const spec = ctx.createAnalyser();
-        spec.fftSize = 32768;
-        spec.smoothingTimeConstant = 0;
-        const fast = ctx.createAnalyser();
-        fast.fftSize = 2048;
-        source.connect(spec);
-        source.connect(fast);
+        const spec = ctx.createAnalyser(); spec.fftSize = 32768; spec.smoothingTimeConstant = 0;
+        const fast = ctx.createAnalyser(); fast.fftSize = 2048;
+        source.connect(spec); source.connect(fast);
         const timeBuf = new Float32Array(fast.fftSize);
         const freqBuf = new Float32Array(spec.frequencyBinCount);
         const sampleRate = ctx.sampleRate;
-        stopFnRef.current = () => {
-          stream.getTracks().forEach((t) => t.stop());
-          ctx.close();
-        };
+        stopFnRef.current = () => { stream.getTracks().forEach((t) => t.stop()); ctx.close(); };
         const takeSnapshot = () => {
           pendingRef.current = null;
           spec.getFloatFrequencyData(freqBuf);
@@ -441,19 +508,12 @@
           let rms = 0;
           for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i];
           rms = Math.sqrt(rms / timeBuf.length);
-          if (armedRef.current && rms > 0.03) {
-            armedRef.current = false;
-            pendingRef.current = setTimeout(takeSnapshot, 450);
-          } else if (!armedRef.current && !pendingRef.current && rms < 0.02) {
-            armedRef.current = true;
-          }
+          if (armedRef.current && rms > 0.03) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshot, 450); }
+          else if (!armedRef.current && !pendingRef.current && rms < 0.02) { armedRef.current = true; }
           rafRef.current = requestAnimationFrame(loop);
         };
         loop();
-      } catch (e) {
-        setStatus("error");
-        setErrorMsg(e.name || String(e));
-      }
+      } catch (e) { setStatus("error"); setErrorMsg(e.name || String(e)); }
     };
     const displayed = result ? result.value : null;
     const noMatch = result != null && result.value == null && filterHz != null;
@@ -464,33 +524,22 @@
     const btnBase = "text-sm uppercase tracking-wide border-2 rounded-md h-11 px-5 transition-colors font-semibold flex items-center justify-center";
     const canFilter = filterHz != null || (result != null && result.value != null);
     const chosen = displayed;
-    return /* @__PURE__ */ React.createElement("div", { className: "no-print flex flex-col gap-2" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3 flex-wrap" }, /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: handleClick,
-        title: status === "listening" ? labels.stop : labels.title,
-        className: btnBase,
-        style: status === "listening" ? { borderColor: accent, backgroundColor: accent, color: "#1a140d" } : { borderColor: accent, color: accent }
-      },
-      status === "listening" ? `\u{1F3A4} ${labels.stop}` : `\u{1F3A4} ${labels.measure}`
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: toggleFilter,
-        disabled: !canFilter,
-        title: labels.filterTitle,
-        className: btnBase,
-        style: filterHz != null ? { borderColor: accent, backgroundColor: accent, color: "#1a140d" } : { borderColor: canFilter ? accent : "#5c4a33", color: canFilter ? accent : "#5c4a33", cursor: canFilter ? "pointer" : "default" }
-      },
-      labels.filter
-    ), displayed != null && (status === "listening" || status === "done") && /* @__PURE__ */ React.createElement("span", { className: resultClass + " text-lg", style: { fontFamily: "ui-monospace, monospace" } },
-      Math.round(displayed), " Hz (", hzToNote(displayed), ")",
-      delta != null ? ` ${delta >= 0 ? "+" : ""}${Math.round(delta)} Hz` : "",
-      status === "listening" ? "\u2026" : ""
-    ), noMatch && /* @__PURE__ */ React.createElement("span", { className: "text-[#c1666b] text-xs" }, labels.filterNoMatch), status === "error" && /* @__PURE__ */ React.createElement("span", { className: "text-[#c1666b] text-xs" }, labels.noTone, errorMsg ? ` (${errorMsg})` : ` \u2014 ${labels.tryLouder}`)), /* @__PURE__ */ React.createElement("div", { className: "flex gap-4 flex-wrap text-[10px] text-[#8a7a5f]", style: { fontFamily: "ui-monospace, monospace" } }, filterHz != null && /* @__PURE__ */ React.createElement("span", { className: "text-[#c9a15a]" }, labels.filterActive, " ", filterHz.toFixed(0), " Hz (", (filterHz / FILTER_BAND).toFixed(0), "\u2013", (filterHz * FILTER_BAND).toFixed(0), ")"), result && result.groups && (status === "listening" || status === "done") && /* @__PURE__ */ React.createElement("span", null, labels.micGroupsLabel, " ", result.groups.map((g, i) => {
-      const isChosen = chosen != null && Math.abs(g - chosen) < 0.5;
-      return /* @__PURE__ */ React.createElement("span", { key: i, style: isChosen ? { color: "#c9a15a", fontWeight: "bold" } : {} }, g.toFixed(0), i < result.groups.length - 1 ? " \xB7 " : "");
-    }), " Hz")));
+    return /* @__PURE__ */ React.createElement("div", { className: "no-print flex flex-col gap-2" },
+      /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3 flex-wrap" },
+        /* @__PURE__ */ React.createElement("button", { onClick: handleClick, title: status === "listening" ? labels.stop : labels.title, className: btnBase, style: status === "listening" ? { borderColor: accent, backgroundColor: accent, color: "#1a140d" } : { borderColor: accent, color: accent } }, status === "listening" ? `\u{1F3A4} ${labels.stop}` : `\u{1F3A4} ${labels.measure}`),
+        /* @__PURE__ */ React.createElement("button", { onClick: toggleFilter, disabled: !canFilter, title: labels.filterTitle, className: btnBase, style: filterHz != null ? { borderColor: accent, backgroundColor: accent, color: "#1a140d" } : { borderColor: canFilter ? accent : "#5c4a33", color: canFilter ? accent : "#5c4a33", cursor: canFilter ? "pointer" : "default" } }, labels.filter),
+        displayed != null && (status === "listening" || status === "done") && /* @__PURE__ */ React.createElement("span", { className: resultClass + " text-lg", style: { fontFamily: "ui-monospace, monospace" } }, Math.round(displayed), " Hz (", hzToNote(displayed), ")", delta != null ? ` ${delta >= 0 ? "+" : ""}${Math.round(delta)} Hz` : "", status === "listening" ? "\u2026" : ""),
+        noMatch && /* @__PURE__ */ React.createElement("span", { className: "text-[#c1666b] text-xs" }, labels.filterNoMatch),
+        status === "error" && /* @__PURE__ */ React.createElement("span", { className: "text-[#c1666b] text-xs" }, labels.noTone, errorMsg ? ` (${errorMsg})` : ` \u2014 ${labels.tryLouder}`)
+      ),
+      /* @__PURE__ */ React.createElement("div", { className: "flex gap-4 flex-wrap text-[10px] text-[#8a7a5f]", style: { fontFamily: "ui-monospace, monospace" } },
+        filterHz != null && /* @__PURE__ */ React.createElement("span", { className: "text-[#c9a15a]" }, labels.filterActive, " ", filterHz.toFixed(0), " Hz (", (filterHz / FILTER_BAND).toFixed(0), "\u2013", (filterHz * FILTER_BAND).toFixed(0), ")"),
+        result && result.groups && (status === "listening" || status === "done") && /* @__PURE__ */ React.createElement("span", null, labels.micGroupsLabel, " ", result.groups.map((g, i) => {
+          const isChosen = chosen != null && Math.abs(g - chosen) < 0.5;
+          return /* @__PURE__ */ React.createElement("span", { key: i, style: isChosen ? { color: "#c9a15a", fontWeight: "bold" } : {} }, g.toFixed(0), i < result.groups.length - 1 ? " \xB7 " : "");
+        }), " Hz")
+      )
+    );
   }
   const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
   function noteToHz(noteName, octave) {
@@ -506,11 +555,7 @@
     low: { label: "Low", high: 2.3, low: 1.2 },
     pro: { label: "Profi-Durchschnitt (empirisch)", high: null, low: null }
   };
-  const PRO_AVERAGE = {
-    "Bass Drum": { high: 1.82, low: 1.62 },
-    "Tom": { high: 1.92, low: 1.6 },
-    "Floor Tom": { high: 1.92, low: 1.6 }
-  };
+  const PRO_AVERAGE = { "Bass Drum": { high: 1.82, low: 1.62 }, "Tom": { high: 1.92, low: 1.6 }, "Floor Tom": { high: 1.92, low: 1.6 } };
   const DRUM_PRESETS = [
     { name: '22" Bass Drum', type: "Bass Drum", diameter: 22, lugs: 10, note: "C", octave: 2 },
     { name: '16" Floor Tom', type: "Floor Tom", diameter: 16, lugs: 8, note: "E", octave: 2 },
@@ -528,17 +573,9 @@
   function computeLugFreqs(fundamentalHz, mode, higherHead, type, calibratedA) {
     const m = mode === "pro" ? PRO_AVERAGE[type] || PRO_AVERAGE["Tom"] : RESONANCE_MODES[mode];
     let highMult, lowMult, calibrated = false;
-    if (calibratedA && calibratedA > 0) {
-      const scale = calibratedA / 1.75;
-      highMult = m.high * scale;
-      lowMult = m.low * scale;
-      calibrated = true;
-    } else {
-      highMult = m.high;
-      lowMult = m.low;
-    }
-    const highFreq = fundamentalHz * highMult;
-    const lowFreq = fundamentalHz * lowMult;
+    if (calibratedA && calibratedA > 0) { const scale = calibratedA / 1.75; highMult = m.high * scale; lowMult = m.low * scale; calibrated = true; }
+    else { highMult = m.high; lowMult = m.low; }
+    const highFreq = fundamentalHz * highMult, lowFreq = fundamentalHz * lowMult;
     if (mode === "maximum") return { top: highFreq, bottom: highFreq, calibrated };
     return higherHead === "top" ? { top: highFreq, bottom: lowFreq, calibrated } : { top: lowFreq, bottom: highFreq, calibrated };
   }
@@ -546,63 +583,45 @@
     var _a, _b;
     const interval = (_a = SNARE_INTERVALS[intervalKey]) != null ? _a : SNARE_INTERVALS.fifth;
     let scale = 1, calibrated = false;
-    if (calibratedA && calibratedA > 0) {
-      scale = calibratedA / 1.75;
-      calibrated = true;
-    }
-    if (intervalKey === "unison") {
-      const both = fundamentalHz * 1.75 * scale;
-      return { top: both, bottom: both, calibrated, overLimit: both > 400 };
-    }
+    if (calibratedA && calibratedA > 0) { scale = calibratedA / 1.75; calibrated = true; }
+    if (intervalKey === "unison") { const both = fundamentalHz * 1.75 * scale; return { top: both, bottom: both, calibrated, overLimit: both > 400 }; }
     const top = fundamentalHz * ((_b = interval.topBase) != null ? _b : SNARE_TOP_BASE) * scale;
     const bottom = top * interval.ratio;
     return { top, bottom, calibrated, overLimit: bottom > 400 };
   }
   let nextId = 5;
   function computeTuningOrder(N) {
-    const half = N / 2;
-    const order = new Array(N).fill(0);
-    const starts = [];
+    const half = N / 2, order = new Array(N).fill(0), starts = [];
     for (let s = 0; s < half; s += 2) starts.push(s);
     for (let s = 1; s < half; s += 2) starts.push(s);
     let seq = 1;
-    for (const s of starts) {
-      order[s] = seq++;
-      order[s + half] = seq++;
-    }
+    for (const s of starts) { order[s] = seq++; order[s + half] = seq++; }
     return order;
   }
   function LugRing({ lugs, topHz, idPrefix }) {
-    const size = 220;
-    const c = size / 2;
-    const r = 82;
+    const size = 220, c = size / 2, r = 82;
     const points = Array.from({ length: lugs }, (_, i) => {
       const angle = i / lugs * 2 * Math.PI - Math.PI / 2;
       return { x: c + r * Math.cos(angle), y: c + r * Math.sin(angle) };
     });
     const order = computeTuningOrder(lugs);
     const byStep = new Array(lugs);
-    order.forEach((step, idx) => {
-      byStep[step - 1] = points[idx];
-    });
+    order.forEach((step, idx) => { byStep[step - 1] = points[idx]; });
     const arrowId = `arrow-${idPrefix}`;
-    return /* @__PURE__ */ React.createElement("svg", { width: size, height: size, className: "shrink-0" }, /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("marker", { id: arrowId, viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "6", markerHeight: "6", orient: "auto-start-reverse" }, /* @__PURE__ */ React.createElement("path", { d: "M2 1L8 5L2 9", fill: "none", stroke: "#c9a15a", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" }))), /* @__PURE__ */ React.createElement("circle", { cx: c, cy: c, r: r + 16, fill: "none", stroke: "#5c4a33", strokeWidth: "1", opacity: "0.4" }), byStep.slice(0, -1).map((p, i) => {
-      const next = byStep[i + 1];
-      return /* @__PURE__ */ React.createElement(
-        "line",
-        {
-          key: i,
-          x1: p.x,
-          y1: p.y,
-          x2: next.x,
-          y2: next.y,
-          stroke: "#c9a15a",
-          strokeWidth: "1.5",
-          opacity: "0.85",
-          markerEnd: `url(#${arrowId})`
-        }
-      );
-    }), /* @__PURE__ */ React.createElement("circle", { cx: c, cy: c, r: 34, fill: "#241b13", stroke: "#c9a15a", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("text", { x: c, y: c, textAnchor: "middle", dominantBaseline: "central", fill: "#e8dcc4", fontSize: "12", fontFamily: "ui-monospace, monospace" }, topHz.toFixed(0), " Hz"), points.map((p, i) => /* @__PURE__ */ React.createElement("g", { key: i }, /* @__PURE__ */ React.createElement("circle", { cx: p.x, cy: p.y, r: "11", fill: "#3a2c1a", stroke: "#c9a15a", strokeWidth: "1.5" }), /* @__PURE__ */ React.createElement("text", { x: p.x, y: p.y, textAnchor: "middle", dominantBaseline: "central", fill: "#e8dcc4", fontSize: "10", fontWeight: "bold" }, order[i]))));
+    return /* @__PURE__ */ React.createElement("svg", { width: size, height: size, className: "shrink-0" },
+      /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("marker", { id: arrowId, viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "6", markerHeight: "6", orient: "auto-start-reverse" }, /* @__PURE__ */ React.createElement("path", { d: "M2 1L8 5L2 9", fill: "none", stroke: "#c9a15a", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" }))),
+      /* @__PURE__ */ React.createElement("circle", { cx: c, cy: c, r: r + 16, fill: "none", stroke: "#5c4a33", strokeWidth: "1", opacity: "0.4" }),
+      byStep.slice(0, -1).map((p, i) => {
+        const next = byStep[i + 1];
+        return /* @__PURE__ */ React.createElement("line", { key: i, x1: p.x, y1: p.y, x2: next.x, y2: next.y, stroke: "#c9a15a", strokeWidth: "1.5", opacity: "0.85", markerEnd: `url(#${arrowId})` });
+      }),
+      /* @__PURE__ */ React.createElement("circle", { cx: c, cy: c, r: 34, fill: "#241b13", stroke: "#c9a15a", strokeWidth: "2" }),
+      /* @__PURE__ */ React.createElement("text", { x: c, y: c, textAnchor: "middle", dominantBaseline: "central", fill: "#e8dcc4", fontSize: "12", fontFamily: "ui-monospace, monospace" }, topHz.toFixed(0), " Hz"),
+      points.map((p, i) => /* @__PURE__ */ React.createElement("g", { key: i },
+        /* @__PURE__ */ React.createElement("circle", { cx: p.x, cy: p.y, r: "11", fill: "#3a2c1a", stroke: "#c9a15a", strokeWidth: "1.5" }),
+        /* @__PURE__ */ React.createElement("text", { x: p.x, y: p.y, textAnchor: "middle", dominantBaseline: "central", fill: "#e8dcc4", fontSize: "10", fontWeight: "bold" }, order[i])
+      ))
+    );
   }
   function TunebotCalculator() {
     const audioCtxRef = useRef(null);
@@ -616,17 +635,10 @@
         s.getTracks().forEach((t2) => t2.stop());
         const devices = await navigator.mediaDevices.enumerateDevices();
         setMicDevices(devices.filter((d) => d.kind === "audioinput"));
-      } catch (e) {
-      }
+      } catch (e) {}
     };
-    const handlePlay = (freqHz) => {
-      const ctx = getAudioCtx(audioCtxRef);
-      playTone(ctx, freqHz);
-    };
-    const handlePlayDrum = (fundamentalHz, topHz, bottomHz) => {
-      const ctx = getAudioCtx(audioCtxRef);
-      playDrumTone(ctx, fundamentalHz, topHz, bottomHz);
-    };
+    const handlePlay = (freqHz) => { const ctx = getAudioCtx(audioCtxRef); playTone(ctx, freqHz); };
+    const handlePlayDrum = (fundamentalHz, topHz, bottomHz) => { const ctx = getAudioCtx(audioCtxRef); playDrumTone(ctx, fundamentalHz, topHz, bottomHz); };
     const handlePrint = () => {
       const prevTitle = document.title;
       document.title = `Fellton - ${setName || (lang === "de" ? "Set" : "Kit")}`;
@@ -634,303 +646,131 @@
       document.title = prevTitle;
     };
     const [setName, setSetName] = useState("Rogers XP8");
-    const [drums, setDrums] = useState(
-      DRUM_PRESETS.map((d, i) => ({
-        id: i,
-        ...d,
-        diameterInput: String(d.diameter).replace(".", ","),
-        mode: "high",
-        higherHead: "bottom",
-        snareInterval: "fifth",
-        calibratedA: null,
-        calibLugInput: "",
-        calibFundInput: "",
-        showCalib: false
-      }))
-    );
-    const addDrum = () => {
-      setDrums([
-        ...drums,
-        {
-          id: nextId++,
-          name: "Neue Trommel",
-          type: "Tom",
-          diameter: 12,
-          diameterInput: "12",
-          lugs: 6,
-          note: "A",
-          octave: 2,
-          mode: "high",
-          higherHead: "bottom",
-          snareInterval: "fifth",
-          calibratedA: null,
-          calibLugInput: "",
-          calibFundInput: "",
-          showCalib: false
-        }
-      ]);
-    };
+    const [drums, setDrums] = useState(DRUM_PRESETS.map((d, i) => ({ id: i, ...d, diameterInput: String(d.diameter).replace(".", ","), mode: "high", higherHead: "bottom", snareInterval: "fifth", calibratedA: null, calibLugInput: "", calibFundInput: "", showCalib: false })));
+    const addDrum = () => { setDrums([...drums, { id: nextId++, name: "Neue Trommel", type: "Tom", diameter: 12, diameterInput: "12", lugs: 6, note: "A", octave: 2, mode: "high", higherHead: "bottom", snareInterval: "fifth", calibratedA: null, calibLugInput: "", calibFundInput: "", showCalib: false }]); };
     const removeDrum = (id) => setDrums(drums.filter((d) => d.id !== id));
     const updateDrum = (id, patch) => setDrums(drums.map((d) => d.id === id ? { ...d, ...patch } : d));
-    const applyCalibration = (d) => {
-      const lugHz = parseFloat(d.calibLugInput);
-      const fundHz = parseFloat(d.calibFundInput);
-      if (!lugHz || !fundHz) return;
-      updateDrum(d.id, { calibratedA: lugHz / fundHz });
-    };
+    const applyCalibration = (d) => { const lugHz = parseFloat(d.calibLugInput), fundHz = parseFloat(d.calibFundInput); if (!lugHz || !fundHz) return; updateDrum(d.id, { calibratedA: lugHz / fundHz }); };
     const resetCalibration = (id) => updateDrum(id, { calibratedA: null, calibLugInput: "", calibFundInput: "" });
-    return /* @__PURE__ */ React.createElement("div", { className: "min-h-screen bg-[#1a140d] text-[#e8dcc4]", style: { fontFamily: "Georgia, 'Iowan Old Style', serif" } }, /* @__PURE__ */ React.createElement("style", null, `
+    return /* @__PURE__ */ React.createElement("div", { className: "min-h-screen bg-[#1a140d] text-[#e8dcc4]", style: { fontFamily: "Georgia, 'Iowan Old Style', serif" } },
+      /* @__PURE__ */ React.createElement("style", null, `
         input, select { font-family: ui-monospace, 'SF Mono', Menlo, monospace; }
-        select {
-          -webkit-appearance: none;
-          -moz-appearance: none;
-          appearance: none;
-        }
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-          -webkit-appearance: none;
-          margin: 0;
-        }
-        input[type=number] {
-          -moz-appearance: textfield;
-        }
+        select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: #5c4a33; border-radius: 4px; }
         .print-only { display: none; }
         @media print {
           .no-print { display: none !important; }
           .print-only { display: block !important; }
-          body, #root, #root * {
-            background: white !important;
-            color: black !important;
-            box-shadow: none !important;
-            border-color: #999 !important;
-          }
+          body, #root, #root * { background: white !important; color: black !important; box-shadow: none !important; border-color: #999 !important; }
           .drum-card { break-inside: avoid; page-break-inside: avoid; margin-bottom: 16px; }
-footer { page-break-before: always; break-before: page; }
+          footer { page-break-before: always; break-before: page; }
           input, select { border: none !important; padding: 0 !important; -webkit-appearance: none; appearance: none; }
         }
-      `), /* @__PURE__ */ React.createElement("header", { className: "border-b border-[#3a2c1a] px-6 py-8 md:px-10" }, /* @__PURE__ */ React.createElement("div", { className: "max-w-5xl mx-auto flex items-start justify-between gap-4 flex-wrap" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-[#c9a15a] text-xs tracking-[0.25em] uppercase mb-2" }, t.eyebrow), /* @__PURE__ */ React.createElement("h1", { className: "text-3xl md:text-4xl", style: { fontFamily: "'Playfair Display', Georgia, serif" } }, "Fellton"), /* @__PURE__ */ React.createElement("p", { className: "mt-2 text-[#a8977b] max-w-xl text-sm leading-relaxed" }, t.subtitle), /* @__PURE__ */ React.createElement("div", { className: "mt-4 flex items-center gap-2" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.setLabel), /* @__PURE__ */ React.createElement(
-      "input",
-      {
-        value: setName,
-        onChange: (e) => setSetName(e.target.value),
-        placeholder: t.setPlaceholder,
-        className: "bg-transparent text-lg border-b border-transparent hover:border-[#5c4a33] focus:border-[#c9a15a] outline-none px-1 py-0.5",
-        style: { fontFamily: "'Playfair Display', Georgia, serif" }
-      }
-    )), /* @__PURE__ */ React.createElement("p", { className: "print-only text-xs text-[#6b5d47] mt-2" }, t.printedOn, " ", (/* @__PURE__ */ new Date()).toLocaleDateString(lang === "de" ? "de-DE" : "en-US")), /* @__PURE__ */ React.createElement("div", { className: "no-print mt-4 flex items-center gap-3 flex-wrap border border-[#5c4a33] bg-[#211910] rounded-md px-4 py-3" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#c9a15a] text-xs uppercase tracking-wide font-semibold" }, t.micLabel), micDevices.length === 0 ? /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: loadMicDevices,
-        className: "text-xs uppercase tracking-wide text-[#1a140d] bg-[#c9a15a] border border-[#c9a15a] rounded-sm px-3 py-1.5 hover:bg-[#e8c07a] transition-colors font-semibold"
-      },
-      t.loadDevices
-    ) : /* @__PURE__ */ React.createElement(
-      "select",
-      {
-        value: micDeviceId,
-        onChange: (e) => setMicDeviceId(e.target.value),
-        className: "bg-[#170f09] border border-[#c9a15a] rounded-sm px-3 py-1.5 text-sm outline-none focus:border-[#e8c07a] text-[#e8dcc4]"
-      },
-      /* @__PURE__ */ React.createElement("option", { value: "" }, t.defaultMic),
-      micDevices.map((d) => /* @__PURE__ */ React.createElement("option", { key: d.deviceId, value: d.deviceId }, d.label || t.micFallback))
-    ))), /* @__PURE__ */ React.createElement("div", { className: "no-print shrink-0 flex items-center gap-3" }, /* @__PURE__ */ React.createElement("div", { className: "flex border border-[#5c4a33] rounded-sm overflow-hidden" }, /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setLang("de"),
-        className: `text-xs uppercase tracking-wide px-3 py-2 transition-colors ${lang === "de" ? "bg-[#c9a15a] text-[#1a140d]" : "text-[#c9a15a] hover:bg-[#3a2c1a]"}`
-      },
-      "DE"
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => setLang("en"),
-        className: `text-xs uppercase tracking-wide px-3 py-2 transition-colors ${lang === "en" ? "bg-[#c9a15a] text-[#1a140d]" : "text-[#c9a15a] hover:bg-[#3a2c1a]"}`
-      },
-      "EN"
-    )), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: handlePrint,
-        className: "text-xs uppercase tracking-wide border border-[#c9a15a] text-[#c9a15a] rounded-sm px-4 py-2.5 hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors"
-      },
-      t.printButton
-    )))), /* @__PURE__ */ React.createElement("main", { className: "max-w-5xl mx-auto px-6 md:px-10 py-8 space-y-6" }, drums.map((d) => {
-      const fundamentalHz = noteToHz(d.note, d.octave);
-      const isSnare = d.type === "Snare";
-      const { top, bottom, calibrated, overLimit } = isSnare ? computeSnareLugFreqs(fundamentalHz, d.snareInterval, d.calibratedA) : { ...computeLugFreqs(fundamentalHz, d.mode, d.higherHead, d.type, d.calibratedA), overLimit: false };
-      return /* @__PURE__ */ React.createElement("div", { key: d.id, className: "drum-card border border-[#3a2c1a] rounded-sm bg-[#211910] p-5 md:p-6" }, /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-4 mb-5 flex-wrap" }, /* @__PURE__ */ React.createElement(
-        "input",
-        {
-          value: d.name,
-          onChange: (e) => updateDrum(d.id, { name: e.target.value }),
-          className: "bg-transparent text-lg md:text-xl border-b border-transparent hover:border-[#5c4a33] focus:border-[#c9a15a] outline-none px-1 py-0.5",
-          style: { fontFamily: "'Playfair Display', Georgia, serif" }
-        }
-      ), /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => removeDrum(d.id),
-          className: "no-print text-[#a8756a] hover:text-[#d99a8c] text-xs tracking-wide uppercase"
-        },
-        t.remove
-      )), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6" }, /* @__PURE__ */ React.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm" }, /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.typeLabel), /* @__PURE__ */ React.createElement(
-        "select",
-        {
-          value: d.type,
-          onChange: (e) => updateDrum(d.id, { type: e.target.value }),
-          className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        },
-        DRUM_TYPES.map((t2) => /* @__PURE__ */ React.createElement("option", { key: t2, value: t2 }, t2))
-      )), /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.diameterLabel), /* @__PURE__ */ React.createElement(
-        "input",
-        {
-          type: "text",
-          inputMode: "decimal",
-          value: d.diameterInput,
-          onChange: (e) => {
-            const raw = e.target.value;
-            if (!/^[0-9]*[.,]?[0-9]*$/.test(raw)) return;
-            const num = parseFloat(raw.replace(",", "."));
-            updateDrum(d.id, { diameterInput: raw, diameter: isNaN(num) ? 0 : num });
-          },
-          className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        }
-      )), /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.lugsLabel), /* @__PURE__ */ React.createElement(
-        "input",
-        {
-          type: "number",
-          value: d.lugs,
-          onChange: (e) => updateDrum(d.id, { lugs: Number(e.target.value) }),
-          className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        }
-      )), /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.noteLabel), /* @__PURE__ */ React.createElement(
-        "select",
-        {
-          value: d.note,
-          onChange: (e) => updateDrum(d.id, { note: e.target.value }),
-          className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        },
-        NOTE_NAMES.map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n))
-      )), /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.octaveLabel), /* @__PURE__ */ React.createElement(
-        "input",
-        {
-          type: "number",
-          value: d.octave,
-          onChange: (e) => updateDrum(d.id, { octave: Number(e.target.value) }),
-          className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        }
-      ))), calibrated && /* @__PURE__ */ React.createElement("div", { className: "text-xs text-[#c9a15a]" }, t.calibratedActive, " ", d.calibratedA.toFixed(3)), /* @__PURE__ */ React.createElement("div", { className: "no-print border border-[#3a2c1a] rounded-sm p-3 bg-[#170f09]" }, /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => updateDrum(d.id, { showCalib: !d.showCalib }),
-          className: "text-xs uppercase tracking-wide text-[#c9a15a] hover:text-[#e8c07a]"
-        },
-        d.showCalib ? "\u2212" : "+",
-        " ",
-        t.calibrateToggle,
-        " ",
-        calibrated ? t.activeSuffix : ""
-      ), d.showCalib && /* @__PURE__ */ React.createElement("div", { className: "mt-3 space-y-3" }, /* @__PURE__ */ React.createElement("p", { className: "text-xs text-[#8a7a5f] leading-relaxed" }, t.calibrateInstructions), /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-3 text-sm" }, /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.calibLugLabel), /* @__PURE__ */ React.createElement(
-        "input",
-        {
-          type: "number",
-          placeholder: "z.B. 172",
-          value: d.calibLugInput,
-          onChange: (e) => updateDrum(d.id, { calibLugInput: e.target.value }),
-          className: "bg-[#211910] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        }
-      )), /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.calibFundLabel), /* @__PURE__ */ React.createElement(
-        "input",
-        {
-          type: "number",
-          placeholder: "z.B. 98",
-          value: d.calibFundInput,
-          onChange: (e) => updateDrum(d.id, { calibFundInput: e.target.value }),
-          className: "bg-[#211910] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        }
-      ))), /* @__PURE__ */ React.createElement("div", { className: "flex gap-3" }, /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => applyCalibration(d),
-          className: "text-xs uppercase tracking-wide bg-[#c9a15a] text-[#1a140d] px-3 py-1.5 rounded-sm hover:bg-[#e8c07a]"
-        },
-        t.apply
-      ), calibrated && /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => resetCalibration(d.id),
-          className: "text-xs uppercase tracking-wide text-[#a8756a] hover:text-[#d99a8c] px-3 py-1.5"
-        },
-        t.reset
-      )))), isSnare ? /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 gap-3 text-sm" }, /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.intervalLabel), /* @__PURE__ */ React.createElement(
-        "select",
-        {
-          value: d.snareInterval,
-          onChange: (e) => updateDrum(d.id, { snareInterval: e.target.value }),
-          className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        },
-        Object.entries(SNARE_INTERVALS).map(([key]) => /* @__PURE__ */ React.createElement("option", { key, value: key }, t.snareIntervals[key].label))
-      ))) : /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm" }, /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.resonanceModeLabel), /* @__PURE__ */ React.createElement(
-        "select",
-        {
-          value: d.mode,
-          onChange: (e) => updateDrum(d.id, { mode: e.target.value }),
-          className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        },
-        Object.entries(RESONANCE_MODES).map(([key]) => /* @__PURE__ */ React.createElement("option", { key, value: key }, t.modes[key].label))
-      )), d.mode !== "maximum" && /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.higherHeadLabel), /* @__PURE__ */ React.createElement(
-        "select",
-        {
-          value: d.higherHead,
-          onChange: (e) => updateDrum(d.id, { higherHead: e.target.value }),
-          className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]"
-        },
-        /* @__PURE__ */ React.createElement("option", { value: "bottom" }, t.resoLower),
-        /* @__PURE__ */ React.createElement("option", { value: "top" }, t.battTop)
-      ))), /* @__PURE__ */ React.createElement("p", { className: "text-xs text-[#8a7a5f] italic" }, isSnare ? d.snareInterval === "pro" ? t.snareDescPro : t.snareDescDefault : d.mode === "pro" ? t.modeDescPro : t.modes[d.mode].desc), isSnare && overLimit && /* @__PURE__ */ React.createElement("p", { className: "text-xs text-[#c1666b]" }, t.overLimitWarning), /* @__PURE__ */ React.createElement("div", { className: "flex gap-6 pt-2 border-t border-[#3a2c1a] items-start flex-wrap" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-[#a8977b] text-xs uppercase tracking-wide mb-1" }, t.fundamentalLabel), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg", style: { fontFamily: "ui-monospace, monospace" } }, fundamentalHz.toFixed(1), " Hz"), /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => handlePlayDrum(fundamentalHz, top, bottom),
-          title: t.playDrumTitle,
-          className: "no-print w-7 h-7 rounded-full border border-[#c9a15a] text-[#c9a15a] hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors flex items-center justify-center text-xs"
-        },
-        "\u25B6"
-      ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-[#c1666b] text-xs uppercase tracking-wide mb-1" }, t.battLabel), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg", style: { fontFamily: "ui-monospace, monospace" } }, top.toFixed(1), " Hz"), /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => handlePlay(top),
-          title: t.playToneTitle,
-          className: "no-print w-7 h-7 rounded-full border border-[#c1666b] text-[#c1666b] hover:bg-[#c1666b] hover:text-[#1a140d] transition-colors flex items-center justify-center text-xs"
-        },
-        "\u25B6"
-      ))), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-[#7fa593] text-xs uppercase tracking-wide mb-1" }, t.resoLabel), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg", style: { fontFamily: "ui-monospace, monospace" } }, bottom.toFixed(1), " Hz"), /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          onClick: () => handlePlay(bottom),
-          title: t.playToneTitle,
-          className: "no-print w-7 h-7 rounded-full border border-[#7fa593] text-[#7fa593] hover:bg-[#7fa593] hover:text-[#1a140d] transition-colors flex items-center justify-center text-xs"
-        },
-        "\u25B6"
-      )))), /* @__PURE__ */ React.createElement("div", { className: "pt-1" }, /* @__PURE__ */ React.createElement("p", { className: "text-[#a8977b] text-[10px] uppercase tracking-wide mb-2" }, t.measureLabel), /* @__PURE__ */ React.createElement(
-        MicMeasureButton,
-        {
-          accent: "#c9a15a",
-          deviceId: micDeviceId,
-          minHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).min,
-          maxHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).max,
-          labels: { stop: t.micStop, measure: t.micMeasure, title: t.micMeasureTitle, noTone: t.micNoTone, tryLouder: t.micTryLouder, micGroupsLabel: t.micGroupsLabel, filter: t.micFilter, filterTitle: t.micFilterTitle, filterActive: t.micFilterActive, filterNoMatch: t.micFilterNoMatch }
-        }
-      ))), /* @__PURE__ */ React.createElement("div", { className: "flex flex-col items-center gap-2 justify-center" }, /* @__PURE__ */ React.createElement(LugRing, { lugs: d.lugs, topHz: top, idPrefix: d.id }), /* @__PURE__ */ React.createElement("p", { className: "text-[10px] text-[#8a7a5f] uppercase tracking-wide text-center max-w-[160px]" }, t.lugRingCaption))));
-    }), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: addDrum,
-        className: "no-print w-full border border-dashed border-[#5c4a33] rounded-sm py-3 text-[#c9a15a] hover:border-[#c9a15a] hover:bg-[#211910] transition-colors text-sm uppercase tracking-wide"
-      },
-      t.addDrumButton
-    ), /* @__PURE__ */ React.createElement("footer", { className: "pt-6 text-xs text-[#6b5d47] leading-relaxed border-t border-[#3a2c1a] space-y-2" }, /* @__PURE__ */ React.createElement("p", null, t.footer1), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer3Title), " ", t.footer3), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer4Title), " ", t.footer4a, " ", /* @__PURE__ */ React.createElement("em", null, t.footer4b), " ", t.footer4c), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer5Title), " ", t.footer5), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer6Title), " ", t.footer6, " ", t.micTestHint, " ", /* @__PURE__ */ React.createElement("a", { href: "mic-test.html", target: "_blank", rel: "noopener", className: "text-[#c9a15a] underline hover:text-[#e8c07a]" }, t.micTestLink)), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer7Title), " ", t.footer7), /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer8Title), " ", t.footer8))));
+      `),
+      /* @__PURE__ */ React.createElement("header", { className: "border-b border-[#3a2c1a] px-6 py-8 md:px-10" },
+        /* @__PURE__ */ React.createElement("div", { className: "max-w-5xl mx-auto flex items-start justify-between gap-4 flex-wrap" },
+          /* @__PURE__ */ React.createElement("div", null,
+            /* @__PURE__ */ React.createElement("p", { className: "text-[#c9a15a] text-xs tracking-[0.25em] uppercase mb-2" }, t.eyebrow),
+            /* @__PURE__ */ React.createElement("h1", { className: "text-3xl md:text-4xl", style: { fontFamily: "'Playfair Display', Georgia, serif" } }, "Fellton"),
+            /* @__PURE__ */ React.createElement("p", { className: "mt-2 text-[#a8977b] max-w-xl text-sm leading-relaxed" }, t.subtitle),
+            /* @__PURE__ */ React.createElement("div", { className: "mt-4 flex items-center gap-2" },
+              /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.setLabel),
+              /* @__PURE__ */ React.createElement("input", { value: setName, onChange: (e) => setSetName(e.target.value), placeholder: t.setPlaceholder, className: "bg-transparent text-lg border-b border-transparent hover:border-[#5c4a33] focus:border-[#c9a15a] outline-none px-1 py-0.5", style: { fontFamily: "'Playfair Display', Georgia, serif" } })
+            ),
+            /* @__PURE__ */ React.createElement("p", { className: "print-only text-xs text-[#6b5d47] mt-2" }, t.printedOn, " ", (/* @__PURE__ */ new Date()).toLocaleDateString(lang === "de" ? "de-DE" : "en-US")),
+            /* @__PURE__ */ React.createElement("div", { className: "no-print mt-4 flex items-center gap-3 flex-wrap border border-[#5c4a33] bg-[#211910] rounded-md px-4 py-3" },
+              /* @__PURE__ */ React.createElement("span", { className: "text-[#c9a15a] text-xs uppercase tracking-wide font-semibold" }, t.micLabel),
+              micDevices.length === 0 ? /* @__PURE__ */ React.createElement("button", { onClick: loadMicDevices, className: "text-xs uppercase tracking-wide text-[#1a140d] bg-[#c9a15a] border border-[#c9a15a] rounded-sm px-3 py-1.5 hover:bg-[#e8c07a] transition-colors font-semibold" }, t.loadDevices)
+              : /* @__PURE__ */ React.createElement("select", { value: micDeviceId, onChange: (e) => setMicDeviceId(e.target.value), className: "bg-[#170f09] border border-[#c9a15a] rounded-sm px-3 py-1.5 text-sm outline-none focus:border-[#e8c07a] text-[#e8dcc4]" },
+                /* @__PURE__ */ React.createElement("option", { value: "" }, t.defaultMic),
+                micDevices.map((d) => /* @__PURE__ */ React.createElement("option", { key: d.deviceId, value: d.deviceId }, d.label || t.micFallback))
+              )
+            )
+          ),
+          /* @__PURE__ */ React.createElement("div", { className: "no-print shrink-0 flex items-center gap-3" },
+            /* @__PURE__ */ React.createElement("div", { className: "flex border border-[#5c4a33] rounded-sm overflow-hidden" },
+              /* @__PURE__ */ React.createElement("button", { onClick: () => setLang("de"), className: `text-xs uppercase tracking-wide px-3 py-2 transition-colors ${lang === "de" ? "bg-[#c9a15a] text-[#1a140d]" : "text-[#c9a15a] hover:bg-[#3a2c1a]"}` }, "DE"),
+              /* @__PURE__ */ React.createElement("button", { onClick: () => setLang("en"), className: `text-xs uppercase tracking-wide px-3 py-2 transition-colors ${lang === "en" ? "bg-[#c9a15a] text-[#1a140d]" : "text-[#c9a15a] hover:bg-[#3a2c1a]"}` }, "EN")
+            ),
+            /* @__PURE__ */ React.createElement("button", { onClick: handlePrint, className: "text-xs uppercase tracking-wide border border-[#c9a15a] text-[#c9a15a] rounded-sm px-4 py-2.5 hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors" }, t.printButton),
+            /* @__PURE__ */ React.createElement("button", { onClick: () => openHelp(), className: "text-xs uppercase tracking-wide border border-[#c9a15a] text-[#c9a15a] rounded-sm px-4 py-2.5 hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors" }, t.helpButton)
+          )
+        )
+      ),
+      /* @__PURE__ */ React.createElement("main", { className: "max-w-5xl mx-auto px-6 md:px-10 py-8 space-y-6" },
+        drums.map((d) => {
+          const fundamentalHz = noteToHz(d.note, d.octave);
+          const isSnare = d.type === "Snare";
+          const { top, bottom, calibrated, overLimit } = isSnare ? computeSnareLugFreqs(fundamentalHz, d.snareInterval, d.calibratedA) : { ...computeLugFreqs(fundamentalHz, d.mode, d.higherHead, d.type, d.calibratedA), overLimit: false };
+          return /* @__PURE__ */ React.createElement("div", { key: d.id, className: "drum-card border border-[#3a2c1a] rounded-sm bg-[#211910] p-5 md:p-6" },
+            /* @__PURE__ */ React.createElement("div", { className: "flex items-start justify-between gap-4 mb-5 flex-wrap" },
+              /* @__PURE__ */ React.createElement("input", { value: d.name, onChange: (e) => updateDrum(d.id, { name: e.target.value }), className: "bg-transparent text-lg md:text-xl border-b border-transparent hover:border-[#5c4a33] focus:border-[#c9a15a] outline-none px-1 py-0.5", style: { fontFamily: "'Playfair Display', Georgia, serif" } }),
+              /* @__PURE__ */ React.createElement("button", { onClick: () => removeDrum(d.id), className: "no-print text-[#a8756a] hover:text-[#d99a8c] text-xs tracking-wide uppercase" }, t.remove)
+            ),
+            /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6" },
+              /* @__PURE__ */ React.createElement("div", { className: "space-y-4" },
+                /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm" },
+                  /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.typeLabel), /* @__PURE__ */ React.createElement("select", { value: d.type, onChange: (e) => updateDrum(d.id, { type: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, DRUM_TYPES.map((t2) => /* @__PURE__ */ React.createElement("option", { key: t2, value: t2 }, t2)))),
+                  /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.diameterLabel), /* @__PURE__ */ React.createElement("input", { type: "text", inputMode: "decimal", value: d.diameterInput, onChange: (e) => { const raw = e.target.value; if (!/^[0-9]*[.,]?[0-9]*$/.test(raw)) return; const num = parseFloat(raw.replace(",", ".")); updateDrum(d.id, { diameterInput: raw, diameter: isNaN(num) ? 0 : num }); }, className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" })),
+                  /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.lugsLabel), /* @__PURE__ */ React.createElement("input", { type: "number", value: d.lugs, onChange: (e) => updateDrum(d.id, { lugs: Number(e.target.value) }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" })),
+                  /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.noteLabel), /* @__PURE__ */ React.createElement("select", { value: d.note, onChange: (e) => updateDrum(d.id, { note: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, NOTE_NAMES.map((n) => /* @__PURE__ */ React.createElement("option", { key: n, value: n }, n)))),
+                  /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.octaveLabel), /* @__PURE__ */ React.createElement("input", { type: "number", value: d.octave, onChange: (e) => updateDrum(d.id, { octave: Number(e.target.value) }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }))
+                ),
+                calibrated && /* @__PURE__ */ React.createElement("div", { className: "text-xs text-[#c9a15a]" }, t.calibratedActive, " ", d.calibratedA.toFixed(3)),
+                /* @__PURE__ */ React.createElement("div", { className: "no-print border border-[#3a2c1a] rounded-sm p-3 bg-[#170f09]" },
+                  /* @__PURE__ */ React.createElement("button", { onClick: () => updateDrum(d.id, { showCalib: !d.showCalib }), className: "text-xs uppercase tracking-wide text-[#c9a15a] hover:text-[#e8c07a]" }, d.showCalib ? "\u2212" : "+", " ", t.calibrateToggle, " ", calibrated ? t.activeSuffix : ""),
+                  d.showCalib && /* @__PURE__ */ React.createElement("div", { className: "mt-3 space-y-3" },
+                    /* @__PURE__ */ React.createElement("p", { className: "text-xs text-[#8a7a5f] leading-relaxed" }, t.calibrateInstructions),
+                    /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-2 gap-3 text-sm" },
+                      /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.calibLugLabel), /* @__PURE__ */ React.createElement("input", { type: "number", placeholder: "z.B. 172", value: d.calibLugInput, onChange: (e) => updateDrum(d.id, { calibLugInput: e.target.value }), className: "bg-[#211910] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" })),
+                      /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.calibFundLabel), /* @__PURE__ */ React.createElement("input", { type: "number", placeholder: "z.B. 98", value: d.calibFundInput, onChange: (e) => updateDrum(d.id, { calibFundInput: e.target.value }), className: "bg-[#211910] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }))
+                    ),
+                    /* @__PURE__ */ React.createElement("div", { className: "flex gap-3" },
+                      /* @__PURE__ */ React.createElement("button", { onClick: () => applyCalibration(d), className: "text-xs uppercase tracking-wide bg-[#c9a15a] text-[#1a140d] px-3 py-1.5 rounded-sm hover:bg-[#e8c07a]" }, t.apply),
+                      calibrated && /* @__PURE__ */ React.createElement("button", { onClick: () => resetCalibration(d.id), className: "text-xs uppercase tracking-wide text-[#a8756a] hover:text-[#d99a8c] px-3 py-1.5" }, t.reset)
+                    )
+                  )
+                ),
+                isSnare ? /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 gap-3 text-sm" },
+                  /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.intervalLabel), /* @__PURE__ */ React.createElement("select", { value: d.snareInterval, onChange: (e) => updateDrum(d.id, { snareInterval: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, Object.entries(SNARE_INTERVALS).map(([key]) => /* @__PURE__ */ React.createElement("option", { key, value: key }, t.snareIntervals[key].label))))
+                ) : /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm" },
+                  /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.resonanceModeLabel), /* @__PURE__ */ React.createElement("select", { value: d.mode, onChange: (e) => updateDrum(d.id, { mode: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, Object.entries(RESONANCE_MODES).map(([key]) => /* @__PURE__ */ React.createElement("option", { key, value: key }, t.modes[key].label)))),
+                  d.mode !== "maximum" && /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.higherHeadLabel), /* @__PURE__ */ React.createElement("select", { value: d.higherHead, onChange: (e) => updateDrum(d.id, { higherHead: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, /* @__PURE__ */ React.createElement("option", { value: "bottom" }, t.resoLower), /* @__PURE__ */ React.createElement("option", { value: "top" }, t.battTop)))
+                ),
+                /* @__PURE__ */ React.createElement("p", { className: "text-xs text-[#8a7a5f] italic" }, isSnare ? d.snareInterval === "pro" ? t.snareDescPro : t.snareDescDefault : d.mode === "pro" ? t.modeDescPro : t.modes[d.mode].desc),
+                isSnare && overLimit && /* @__PURE__ */ React.createElement("p", { className: "text-xs text-[#c1666b]" }, t.overLimitWarning),
+                /* @__PURE__ */ React.createElement("div", { className: "flex gap-6 pt-2 border-t border-[#3a2c1a] items-start flex-wrap" },
+                  /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-[#a8977b] text-xs uppercase tracking-wide mb-1" }, t.fundamentalLabel), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg", style: { fontFamily: "ui-monospace, monospace" } }, fundamentalHz.toFixed(1), " Hz"), /* @__PURE__ */ React.createElement("button", { onClick: () => handlePlayDrum(fundamentalHz, top, bottom), title: t.playDrumTitle, className: "no-print w-7 h-7 rounded-full border border-[#c9a15a] text-[#c9a15a] hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors flex items-center justify-center text-xs" }, "\u25B6"))),
+                  /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-[#c1666b] text-xs uppercase tracking-wide mb-1" }, t.battLabel), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg", style: { fontFamily: "ui-monospace, monospace" } }, top.toFixed(1), " Hz"), /* @__PURE__ */ React.createElement("button", { onClick: () => handlePlay(top), title: t.playToneTitle, className: "no-print w-7 h-7 rounded-full border border-[#c1666b] text-[#c1666b] hover:bg-[#c1666b] hover:text-[#1a140d] transition-colors flex items-center justify-center text-xs" }, "\u25B6"))),
+                  /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("p", { className: "text-[#7fa593] text-xs uppercase tracking-wide mb-1" }, t.resoLabel), /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React.createElement("p", { className: "text-lg", style: { fontFamily: "ui-monospace, monospace" } }, bottom.toFixed(1), " Hz"), /* @__PURE__ */ React.createElement("button", { onClick: () => handlePlay(bottom), title: t.playToneTitle, className: "no-print w-7 h-7 rounded-full border border-[#7fa593] text-[#7fa593] hover:bg-[#7fa593] hover:text-[#1a140d] transition-colors flex items-center justify-center text-xs" }, "\u25B6")))
+                ),
+                /* @__PURE__ */ React.createElement("div", { className: "pt-1" },
+                  /* @__PURE__ */ React.createElement("p", { className: "text-[#a8977b] text-[10px] uppercase tracking-wide mb-2" }, t.measureLabel),
+                  /* @__PURE__ */ React.createElement(MicMeasureButton, { accent: "#c9a15a", deviceId: micDeviceId, minHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).min, maxHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).max, labels: { stop: t.micStop, measure: t.micMeasure, title: t.micMeasureTitle, noTone: t.micNoTone, tryLouder: t.micTryLouder, micGroupsLabel: t.micGroupsLabel, filter: t.micFilter, filterTitle: t.micFilterTitle, filterActive: t.micFilterActive, filterNoMatch: t.micFilterNoMatch } })
+                )
+              ),
+              /* @__PURE__ */ React.createElement("div", { className: "flex flex-col items-center gap-2 justify-center" },
+                /* @__PURE__ */ React.createElement(LugRing, { lugs: d.lugs, topHz: top, idPrefix: d.id }),
+                /* @__PURE__ */ React.createElement("p", { className: "text-[10px] text-[#8a7a5f] uppercase tracking-wide text-center max-w-[160px]" }, t.lugRingCaption)
+              )
+            )
+          );
+        }),
+        /* @__PURE__ */ React.createElement("button", { onClick: addDrum, className: "no-print w-full border border-dashed border-[#5c4a33] rounded-sm py-3 text-[#c9a15a] hover:border-[#c9a15a] hover:bg-[#211910] transition-colors text-sm uppercase tracking-wide" }, t.addDrumButton),
+        /* @__PURE__ */ React.createElement("footer", { className: "pt-6 text-xs text-[#6b5d47] leading-relaxed border-t border-[#3a2c1a] space-y-2" },
+          /* @__PURE__ */ React.createElement("p", null, t.footer1),
+          /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer3Title), " ", t.footer3),
+          /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer4Title), " ", t.footer4a, " ", /* @__PURE__ */ React.createElement("em", null, t.footer4b), " ", t.footer4c),
+          /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer5Title), " ", t.footer5),
+          /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer6Title), " ", t.footer6, " ", t.micTestHint, " ", /* @__PURE__ */ React.createElement("a", { href: "mic-test.html", target: "_blank", rel: "noopener", className: "text-[#c9a15a] underline hover:text-[#e8c07a]" }, t.micTestLink)),
+          /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer7Title), " ", t.footer7),
+          /* @__PURE__ */ React.createElement("p", null, /* @__PURE__ */ React.createElement("strong", { className: "text-[#8a7a5f]" }, t.footer8Title), " ", t.footer8)
+        )
+      )
+    );
   }
   const root = ReactDOM.createRoot(document.getElementById("root"));
   root.render(/* @__PURE__ */ React.createElement(TunebotCalculator, null));
