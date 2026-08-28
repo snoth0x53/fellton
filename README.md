@@ -161,6 +161,10 @@ HTTPS (oder `localhost`) – nicht in eingebetteten Vorschau-Fenstern. Für loka
 Tests: `python3 -m http.server 8000` im Projektordner, dann
 `http://localhost:8000` öffnen.
 
+---
+
+Das separate **[Mikrofon-Test-Tool](ANLEITUNG-MIC-TEST.md)** hat eine eigene Anleitung.
+
 ## Genauigkeit der Mikrofon-Messung
 
 Nach jedem Anschlag wird das Frequenzspektrum per FFT analysiert (Fenstergröße 32768):
