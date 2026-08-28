@@ -18,9 +18,7 @@
     color: #e8dcc4; font-size: 14px; line-height: 1.7;
   }
   .help-panel.open { transform: translateX(0); }
-  .help-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999;
-  }
+  .help-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
   .help-overlay.open { display: block; }
   .help-panel h2 { font-size: 20px; color: #c9a15a; margin: 0 0 16px; font-family: 'Playfair Display', Georgia, serif; }
   .help-panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #c9a15a; margin: 24px 0 8px; border-top: 1px solid #3a2c1a; padding-top: 16px; }
@@ -29,6 +27,8 @@
   .help-panel li { margin-bottom: 4px; }
   .help-panel strong { color: #e8dcc4; font-weight: normal; }
   .help-panel a { color: #c9a15a; }
+  .help-lang { display: none; }
+  .help-lang.active { display: block; }
   .help-close {
     position: sticky; top: 0; float: right; margin: -4px -4px 8px 8px;
     background: #3a2c1a; border: none; color: #c9a15a; cursor: pointer;
@@ -41,80 +41,131 @@
 <body>
 <div id="root"></div>
 
-<!-- Hilfe-Panel -->
-<div class="help-overlay" id="helpOverlay" onclick="closeHelp()"></div>
+<div class="help-overlay no-print" id="helpOverlay" onclick="closeHelp()"></div>
 <div class="help-panel no-print" id="helpPanel">
   <button class="help-close" onclick="closeHelp()">×</button>
-  <h2>📖 Fellton – Anleitung</h2>
 
-  <h3>Erste Schritte</h3>
-  <p>Oben links auf <strong>„Geräte laden"</strong> klicken, Mikrofon-Erlaubnis bestätigen, dann das Mikrofon aus der Liste wählen.</p>
+  <!-- DE -->
+  <div class="help-lang active" id="helpDe">
+    <h2>📖 Fellton – Anleitung</h2>
+    <h3>Erste Schritte</h3>
+    <p>Oben links auf <strong>„Geräte laden"</strong> klicken, Mikrofon-Erlaubnis bestätigen, dann das Mikrofon aus der Liste wählen.</p>
+    <h3>Set benennen</h3>
+    <p>Das Textfeld neben <strong>„Set:"</strong> benennt das Kit (z. B. „Rogers XP8"). Der Name erscheint auf der PDF.</p>
+    <h3>Trommel einrichten</h3>
+    <ul>
+      <li><strong>Typ</strong> — Bass Drum, Tom, Floor Tom oder Snare</li>
+      <li><strong>Ø (")</strong> — Durchmesser in Zoll</li>
+      <li><strong>Lugs</strong> — Anzahl Spannschrauben (bestimmt Kreuz-Stimmreihenfolge)</li>
+      <li><strong>Grundton + Oktave</strong> — gewünschte Tonhöhe, Basis aller Berechnungen</li>
+    </ul>
+    <h3>Resonance-Modus (Toms / Bassdrum)</h3>
+    <ul>
+      <li><strong>Maximum (Unisono)</strong> — beide Felle gleich, volles Sustain</li>
+      <li><strong>High</strong> — leichtes Intervall, für Live gut geeignet</li>
+      <li><strong>Medium</strong> — deutlicheres Intervall, klarerer Attack</li>
+      <li><strong>Low</strong> — größtes Intervall, kürzestes Sustain</li>
+      <li><strong>Profi-Durchschnitt</strong> — empirisch aus 90+ Artist-Tunings</li>
+    </ul>
+    <p>Mit <strong>„Höheres Fell"</strong> lässt sich festlegen ob Schlag- oder Resonanzfell höher gestimmt ist — das tauscht die berechneten Frequenzen.</p>
+    <h3>Snare-Intervall</h3>
+    <p>Statt Resonance-Modus wählt man das Intervall zwischen Reso- und Schlagfell: Quinte (Standard), Quarte, Terz, Unisono oder Profi-Durchschnitt (n=22). <strong>Snare immer mit ausgehängtem Teppich messen.</strong></p>
+    <h3>Lug-für-Lug stimmen</h3>
+    <p>🎤-Button startet die Messung, nochmal drücken stoppt sie.</p>
+    <ul>
+      <li><strong>Nah am Lug (2–3 cm vom Rand)</strong> → Lug-Frequenz dieser Schraube</li>
+      <li><strong>Mittig</strong> → Grundton der ganzen Trommel</li>
+    </ul>
+    <p>Der <strong>Lug-Ring</strong> zeigt die Kreuz-Stimmreihenfolge: immer zum gegenüberliegenden Lug, dann eine weiter.</p>
+    <p><strong>Ablauf:</strong> Trommel umdrehen — zu stimmendes Fell oben, das andere auf weicher Unterlage. Lugs in Kreuz-Reihenfolge anschlagen, Schrauben anpassen bis die Anzeige grün wird. Dann umdrehen und zweites Fell genauso.</p>
+    <h3>Filter</h3>
+    <p>Ab ~300 Hz wird die Messung ungenauer. Lösung: erst korrekte Messung machen, dann <strong>Filter</strong> drücken. Ab dann kommen nur noch Frequenzen im Bereich ±1,5 Halbtöne infrage. Nochmal drücken schaltet aus. Bei Stimmungsänderungen neu setzen.</p>
+    <h3>Kalibrieren</h3>
+    <p><strong>Schritt 1:</strong> Beide Felle auf dieselbe Lug-Frequenz stimmen (Unisono).</p>
+    <p><strong>Schritt 2:</strong> Trommel auf Ständer, mittig anschlagen → Grundton messen.</p>
+    <p><strong>Schritt 3:</strong> „+ Kalibrieren" öffnen, Lug-Frequenz und Grundton eintragen, <strong>Übernehmen</strong> drücken.</p>
+    <h3>Eigenes Set erstellen</h3>
+    <p>Unten auf <strong>„+ Trommel hinzufügen"</strong> klicken, Typ und Einstellungen anpassen. Nicht benötigte Trommeln über <strong>„Entfernen"</strong> löschen.</p>
+    <h3>Ton-Vorschau</h3>
+    <p>▶ neben Schlag-/Resofell: Sinuston auf Zielfrequenz. ▶ neben Grundton: simulierter Trommelklang.</p>
+    <h3>Drucken / PDF</h3>
+    <p>Oben rechts <strong>🖨</strong> klicken. Erläuterungstext erscheint auf eigener Seite — im Druckdialog abwählbar.</p>
+    <h3>Tipps</h3>
+    <ul>
+      <li><strong>Smartphone:</strong> möglichst nah an die Anschlagsstelle halten.</li>
+      <li><strong>Externes Mikrofon</strong> (z. B. Boya By-V10) liefert zuverlässigere Werte.</li>
+      <li><strong>Snare-Teppich aushängen</strong> — das Rasseln stört die Messung.</li>
+      <li><strong>Nach Fellwechsel:</strong> Filter aus, von unten hocharbeiten.</li>
+      <li><strong>Kalibrierung lohnt sich</strong> — einmal pro Trommel/Fell.</li>
+    </ul>
+    <h3>Mikrofon-Test-Tool</h3>
+    <p>Separates Diagnose-Werkzeug mit Sound Score und CSV-Export: <a href="mic-test.html" target="_blank">mic-test.html</a></p>
+  </div>
 
-  <h3>Set benennen</h3>
-  <p>Das Textfeld neben <strong>„Set:"</strong> benennt das Kit (z. B. „Rogers XP8"). Der Name erscheint auf der PDF.</p>
-
-  <h3>Trommel einrichten</h3>
-  <ul>
-    <li><strong>Typ</strong> — Bass Drum, Tom, Floor Tom oder Snare</li>
-    <li><strong>Ø (")</strong> — Durchmesser in Zoll</li>
-    <li><strong>Lugs</strong> — Anzahl Spannschrauben (bestimmt Kreuz-Stimmreihenfolge)</li>
-    <li><strong>Grundton + Oktave</strong> — gewünschte Tonhöhe, Basis aller Berechnungen</li>
-  </ul>
-
-  <h3>Resonance-Modus (Toms / Bassdrum)</h3>
-  <ul>
-    <li><strong>Maximum (Unisono)</strong> — beide Felle gleich, volles Sustain</li>
-    <li><strong>High</strong> — leichtes Intervall, für Live gut geeignet</li>
-    <li><strong>Medium</strong> — deutlicheres Intervall, klarerer Attack</li>
-    <li><strong>Low</strong> — größtes Intervall, kürzestes Sustain</li>
-    <li><strong>Profi-Durchschnitt</strong> — empirisch aus 90+ Artist-Tunings</li>
-  </ul>
-  <p>Mit <strong>„Höheres Fell"</strong> lässt sich festlegen ob Schlag- oder Resonanzfell höher gestimmt ist — das tauscht die berechneten Frequenzen.</p>
-
-  <h3>Snare-Intervall</h3>
-  <p>Statt Resonance-Modus wählt man das Intervall zwischen Reso- und Schlagfell: Quinte (Standard), Quarte, Terz, Unisono oder Profi-Durchschnitt (n=22). <strong>Snare immer mit ausgehängtem Teppich messen.</strong></p>
-
-  <h3>Lug-für-Lug stimmen</h3>
-  <p>🎤-Button startet die Messung, nochmal drücken stoppt sie.</p>
-  <ul>
-    <li><strong>Nah am Lug (2–3 cm vom Rand)</strong> → Lug-Frequenz dieser Schraube</li>
-    <li><strong>Mittig</strong> → Grundton der ganzen Trommel</li>
-  </ul>
-  <p>Der <strong>Lug-Ring</strong> zeigt die Kreuz-Stimmreihenfolge: immer zum gegenüberliegenden Lug, dann eine weiter.</p>
-  <p><strong>Ablauf:</strong> Trommel umdrehen — zu stimmendes Fell oben, das andere auf weicher Unterlage. Lugs in Kreuz-Reihenfolge anschlagen, Schrauben anpassen bis die Anzeige grün wird. Dann umdrehen und zweites Fell genauso.</p>
-
-  <h3>Filter</h3>
-  <p>Ab ~300 Hz wird die Messung ungenauer. Lösung: erst korrekte Messung machen, dann <strong>Filter</strong> drücken. Ab dann kommen nur noch Frequenzen im Bereich ±1,5 Halbtöne infrage. Nochmal drücken schaltet aus. Bei Stimmungsänderungen neu setzen.</p>
-
-  <h3>Kalibrieren</h3>
-  <p><strong>Schritt 1:</strong> Beide Felle auf dieselbe Lug-Frequenz stimmen (Unisono).</p>
-  <p><strong>Schritt 2:</strong> Trommel auf Ständer, mittig anschlagen → Grundton messen.</p>
-  <p><strong>Schritt 3:</strong> „+ Kalibrieren" öffnen, Lug-Frequenz und Grundton eintragen, <strong>Übernehmen</strong> drücken. Fellton rechnet ab jetzt mit dem individuellen Koeffizienten dieser Trommel.</p>
-
-  <h3>Eigenes Set erstellen</h3>
-  <p>Unten auf <strong>„+ Trommel hinzufügen"</strong> klicken, Typ und Einstellungen anpassen. Name oben im Trommel-Feld eintragen. Nicht mehr benötigte Trommeln über <strong>„Entfernen"</strong> löschen.</p>
-
-  <h3>Ton-Vorschau</h3>
-  <p>▶ neben Schlag-/Resofell: Sinuston auf Zielfrequenz. ▶ neben Grundton: simulierter Trommelklang zur Orientierung.</p>
-
-  <h3>Drucken / PDF</h3>
-  <p>Oben rechts <strong>🖨</strong> klicken. Der Erläuterungstext erscheint auf einer eigenen letzten Seite — im Druckdialog abwählbar.</p>
-
-  <h3>Tipps</h3>
-  <ul>
-    <li><strong>Smartphone als Mikrofon:</strong> möglichst nah an die Anschlagsstelle halten — je näher, desto stabiler die Erkennung.</li>
-    <li><strong>Externes Mikrofon</strong> (z. B. Boya By-V10 direkt ans Fell geklammert) liefert zuverlässigere Werte.</li>
-    <li><strong>Snare-Teppich aushängen</strong> — das Rasseln stört die Messung stark.</li>
-    <li><strong>Nach Fellwechsel:</strong> Filter aus, von unten hocharbeiten, dann Filter setzen.</li>
-    <li><strong>Kalibrierung lohnt sich</strong> — einmal pro Trommel/Fell macht die Berechnung deutlich genauer.</li>
-  </ul>
-
-  <h3>Mikrofon-Test-Tool</h3>
-  <p>Separates Diagnose-Werkzeug zum Prüfen des Mikrofon-Setups, mit Sound Score, CSV-Export und Mikrofon-Vergleich: <a href="mic-test.html" target="_blank">mic-test.html</a></p>
+  <!-- EN -->
+  <div class="help-lang" id="helpEn">
+    <h2>📖 Fellton – User Guide</h2>
+    <h3>Getting started</h3>
+    <p>Click <strong>"Load devices"</strong> at the top left, confirm microphone permission, then select the microphone from the list.</p>
+    <h3>Naming the kit</h3>
+    <p>The text field next to <strong>"Kit:"</strong> names the set (e.g. "Rogers XP8"). The name appears on the PDF.</p>
+    <h3>Setting up a drum</h3>
+    <ul>
+      <li><strong>Type</strong> — Bass Drum, Tom, Floor Tom or Snare</li>
+      <li><strong>Ø (")</strong> — diameter in inches</li>
+      <li><strong>Lugs</strong> — number of tension rods (determines cross-tuning order)</li>
+      <li><strong>Note + Octave</strong> — desired pitch, basis for all calculations</li>
+    </ul>
+    <h3>Resonance mode (Toms / Bass Drum)</h3>
+    <ul>
+      <li><strong>Maximum (Unison)</strong> — both heads equal, full sustain</li>
+      <li><strong>High</strong> — slight interval, good for live use</li>
+      <li><strong>Medium</strong> — clearer interval, crisper attack</li>
+      <li><strong>Low</strong> — largest interval, shortest sustain</li>
+      <li><strong>Pro average</strong> — empirical, from 90+ artist tunings</li>
+    </ul>
+    <p><strong>"Higher head"</strong> sets which head is tuned higher — this swaps the calculated frequencies.</p>
+    <h3>Snare interval</h3>
+    <p>Instead of resonance mode, choose the interval between reso and batter: fifth (default), fourth, third, unison or pro average (n=22). <strong>Always measure snare with wires disengaged.</strong></p>
+    <h3>Lug-by-lug tuning</h3>
+    <p>The 🎤 button starts measurement; press again to stop.</p>
+    <ul>
+      <li><strong>Close to the lug (2–3 cm from the rim)</strong> → lug frequency of that rod</li>
+      <li><strong>Centre</strong> → fundamental tone of the whole drum</li>
+    </ul>
+    <p>The <strong>lug ring</strong> shows the cross-tuning order: always go to the opposite lug, then one rod further.</p>
+    <p><strong>Procedure:</strong> Flip the drum — head to be tuned faces up, the other rests on a soft surface. Strike lugs in cross order, adjust until the display turns green. Then flip and do the second head.</p>
+    <h3>Filter</h3>
+    <p>Above ~300 Hz measurements get less reliable. Fix: take one correct reading, then press <strong>Filter</strong>. Only frequencies within ±1.5 semitones are considered. Press again to disable. Reset after larger tuning changes.</p>
+    <h3>Calibrating</h3>
+    <p><strong>Step 1:</strong> Tune both heads to the same lug frequency (unison).</p>
+    <p><strong>Step 2:</strong> Place drum on a stand, strike centre → measure fundamental.</p>
+    <p><strong>Step 3:</strong> Open "+ Calibrate", enter lug frequency and fundamental, press <strong>Apply</strong>.</p>
+    <h3>Building your own kit</h3>
+    <p>Click <strong>"+ Add drum"</strong> at the bottom. Adjust type and settings. Remove unwanted drums with <strong>"Remove"</strong>.</p>
+    <h3>Tone preview</h3>
+    <p>▶ next to batter/reso: sine tone at target frequency. ▶ next to fundamental: simulated drum sound.</p>
+    <h3>Print / PDF</h3>
+    <p>Click <strong>🖨</strong> top right. The notes section appears on its own page — deselect it in the print dialog if not needed.</p>
+    <h3>Tips</h3>
+    <ul>
+      <li><strong>Smartphone:</strong> hold as close as possible to the strike point.</li>
+      <li><strong>External mic</strong> (e.g. Boya By-V10 clipped to the head) gives more reliable results.</li>
+      <li><strong>Disengage snare wires</strong> — rattling disrupts the measurement.</li>
+      <li><strong>After changing heads:</strong> turn filter off, work up from the bottom.</li>
+      <li><strong>Calibration is worth it</strong> — once per drum/head.</li>
+    </ul>
+    <h3>Microphone test tool</h3>
+    <p>Separate diagnostic tool with sound score and CSV export: <a href="mic-test.html" target="_blank">mic-test.html</a></p>
+  </div>
 </div>
 
 <script>
-function openHelp() {
+var _helpLang = 'de';
+function openHelp(lang) {
+  _helpLang = lang || _helpLang;
+  document.getElementById('helpDe').className = 'help-lang' + (_helpLang === 'de' ? ' active' : '');
+  document.getElementById('helpEn').className = 'help-lang' + (_helpLang === 'en' ? ' active' : '');
   document.getElementById('helpPanel').classList.add('open');
   document.getElementById('helpOverlay').classList.add('open');
 }
@@ -126,7 +177,7 @@ function closeHelp() {
 
 <script>
 (() => {
-  const { useState, useMemo, useRef } = React;
+  const { useState, useRef } = React;
   const T = {
     de: {
       eyebrow: "Fell-Stimmrechner",
@@ -142,7 +193,7 @@ function closeHelp() {
       helpButton: "? Hilfe",
       remove: "Entfernen",
       typeLabel: "Typ",
-      diameterLabel: 'Ø (")',
+      diameterLabel: '\xD8 (")',
       lugsLabel: "Lugs",
       noteLabel: "Grundton",
       octaveLabel: "Oktave",
@@ -206,66 +257,41 @@ function closeHelp() {
         pro: { label: "Profi-Durchschnitt (empirisch)", desc: "Aus 60+ realen Artist-Tunings (tune-bot.com/artists) berechneter Durchschnitt" }
       },
       snareIntervals: {
-        fifth: { label: "Perfekte Quinte" },
-        fourth: { label: "Perfekte Quarte" },
-        third: { label: "Gro\xDFe Terz" },
-        unison: { label: "Unisono (Maximum Resonance)" },
+        fifth: { label: "Perfekte Quinte" }, fourth: { label: "Perfekte Quarte" },
+        third: { label: "Gro\xDFe Terz" }, unison: { label: "Unisono (Maximum Resonance)" },
         pro: { label: "Profi-Durchschnitt (empirisch, n=22)" }
       }
     },
     en: {
       eyebrow: "Drumhead Tuning Calculator",
       subtitle: "Choose a fundamental note and resonance mode \u2014 the target frequency for every lug is calculated from it.",
-      setLabel: "Kit:",
-      setPlaceholder: "e.g. Rogers XP8, second kit...",
-      printedOn: "Printed on",
-      micLabel: "\u{1F3A4} Microphone:",
-      loadDevices: "Load devices",
-      defaultMic: "Default microphone",
-      micFallback: "Microphone",
-      printButton: "\u{1F5A8} Print / Save as PDF",
-      helpButton: "? Help",
-      remove: "Remove",
-      typeLabel: "Type",
-      diameterLabel: 'Ø (")',
-      lugsLabel: "Lugs",
-      noteLabel: "Note",
-      octaveLabel: "Octave",
+      setLabel: "Kit:", setPlaceholder: "e.g. Rogers XP8, second kit...",
+      printedOn: "Printed on", micLabel: "\u{1F3A4} Microphone:",
+      loadDevices: "Load devices", defaultMic: "Default microphone", micFallback: "Microphone",
+      printButton: "\u{1F5A8} Print / Save as PDF", helpButton: "? Help",
+      remove: "Remove", typeLabel: "Type", diameterLabel: '\xD8 (")',
+      lugsLabel: "Lugs", noteLabel: "Note", octaveLabel: "Octave",
       calibratedActive: "Calibrated coefficient active: a =",
-      calibrateToggle: "Calibrate",
-      activeSuffix: "(active)",
+      calibrateToggle: "Calibrate", activeSuffix: "(active)",
       calibrateInstructions: "Tune both heads to the same lug pitch (unison), strike the drum in the center (on a stand) and measure the real fundamental frequency \u2014 with the mic measurement below or a tuner. Enter both values \u2014 this calculates your real coefficient.",
-      calibLugLabel: "Lug frequency (unison)",
-      calibFundLabel: "Measured fundamental freq.",
-      apply: "Apply",
-      reset: "Reset",
-      intervalLabel: "Interval (reso vs. batter)",
-      resonanceModeLabel: "Resonance mode",
-      higherHeadLabel: "Higher head",
-      resoLower: "Resonant head (bottom)",
-      battTop: "Batter head (top)",
+      calibLugLabel: "Lug frequency (unison)", calibFundLabel: "Measured fundamental freq.",
+      apply: "Apply", reset: "Reset",
+      intervalLabel: "Interval (reso vs. batter)", resonanceModeLabel: "Resonance mode",
+      higherHeadLabel: "Higher head", resoLower: "Resonant head (bottom)", battTop: "Batter head (top)",
       snareDescDefault: "Resonant head higher than batter, default fifth (\xD71.5) \u2014 checked against real measurements.",
       snareDescPro: "Empirical average from 22 real pro snare tunings (tune-bot.com/artists).",
       modeDescPro: "Empirical average from real artist tunings (tune-bot.com/artists).",
       overLimitWarning: "\u26A0 Resonant head above 400 Hz \u2014 risk of overstretching; consider a smaller interval.",
-      fundamentalLabel: "Fundamental (drum tone)",
-      battLabel: "Batter head (lug)",
-      resoLabel: "Reso head (lug)",
-      playDrumTitle: "Play drum tone",
-      playToneTitle: "Play tone",
+      fundamentalLabel: "Fundamental (drum tone)", battLabel: "Batter head (lug)", resoLabel: "Reso head (lug)",
+      playDrumTitle: "Play drum tone", playToneTitle: "Play tone",
       measureLabel: "Measure actual value (strike close to the lug)",
-      addDrumButton: "+ Add drum",
-      lugRingCaption: "Numbers = cross-tuning order",
-      micStop: "Stop",
-      micMeasure: "Measure",
+      addDrumButton: "+ Add drum", lugRingCaption: "Numbers = cross-tuning order",
+      micStop: "Stop", micMeasure: "Measure",
       micMeasureTitle: "Measure via microphone \u2014 runs until you press Stop",
-      micNoTone: "no tone detected",
-      micTryLouder: "try louder/closer",
-      micGroupsLabel: "Groups:",
-      micFilter: "Filter",
+      micNoTone: "no tone detected", micTryLouder: "try louder/closer",
+      micGroupsLabel: "Groups:", micFilter: "Filter",
       micFilterTitle: "Set filter: the last measured value becomes the reference \u2014 from then on only values within one and a half semitones are considered. Click again to switch the filter off.",
-      micFilterActive: "Filter:",
-      micFilterNoMatch: "no value inside filter band",
+      micFilterActive: "Filter:", micFilterNoMatch: "no value inside filter band",
       micTestHint: "There is a separate diagnostic tool for checking the microphone setup:",
       micTestLink: "Microphone test",
       footer1: "Maximum Resonance = fundamental \xD7 1.75 (both heads); High = \xD71.5 / \xD71.85; Medium = \xD71.4 / \xD72.0; Low = \xD71.2 / \xD72.3.",
@@ -291,104 +317,61 @@ function closeHelp() {
         pro: { label: "Pro average (empirical)", desc: "Average calculated from 60+ real artist tunings (tune-bot.com/artists)" }
       },
       snareIntervals: {
-        fifth: { label: "Perfect fifth" },
-        fourth: { label: "Perfect fourth" },
-        third: { label: "Major third" },
-        unison: { label: "Unison (Maximum Resonance)" },
+        fifth: { label: "Perfect fifth" }, fourth: { label: "Perfect fourth" },
+        third: { label: "Major third" }, unison: { label: "Unison (Maximum Resonance)" },
         pro: { label: "Pro average (empirical, n=22)" }
       }
     }
   };
   function getAudioCtx(ref) {
-    if (!ref.current) {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      ref.current = new Ctx();
-    }
+    if (!ref.current) { const Ctx = window.AudioContext || window.webkitAudioContext; ref.current = new Ctx(); }
     if (ref.current.state === "suspended") ref.current.resume();
     return ref.current;
   }
   function playTone(ctx, freqHz, duration = 0.9) {
     const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    osc.type = "sine";
+    const osc = ctx.createOscillator(); osc.type = "sine";
     osc.frequency.setValueAtTime(freqHz, now);
     osc.frequency.exponentialRampToValueAtTime(Math.max(freqHz * 0.85, 20), now + duration);
     const oscGain = ctx.createGain();
     oscGain.gain.setValueAtTime(1e-4, now);
     oscGain.gain.exponentialRampToValueAtTime(0.55, now + 8e-3);
     oscGain.gain.exponentialRampToValueAtTime(1e-3, now + duration);
-    osc.connect(oscGain);
-    oscGain.connect(ctx.destination);
+    osc.connect(oscGain); oscGain.connect(ctx.destination);
     const bufferSize = ctx.sampleRate * 0.05;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-    const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = "bandpass";
-    noiseFilter.frequency.value = freqHz * 2;
-    noiseFilter.Q.value = 0.7;
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.35, now);
-    noiseGain.gain.exponentialRampToValueAtTime(1e-3, now + 0.06);
-    noise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + duration);
-    noise.start(now);
-    noise.stop(now + 0.06);
+    const noise = ctx.createBufferSource(); noise.buffer = buffer;
+    const noiseFilter = ctx.createBiquadFilter(); noiseFilter.type = "bandpass"; noiseFilter.frequency.value = freqHz * 2; noiseFilter.Q.value = 0.7;
+    const noiseGain = ctx.createGain(); noiseGain.gain.setValueAtTime(0.35, now); noiseGain.gain.exponentialRampToValueAtTime(1e-3, now + 0.06);
+    noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(ctx.destination);
+    osc.start(now); osc.stop(now + duration); noise.start(now); noise.stop(now + 0.06);
   }
   function playDrumTone(ctx, fundamentalHz, topHz, bottomHz, duration = 1.4) {
     const now = ctx.currentTime;
-    const master = ctx.createGain();
-    master.gain.value = 0.7;
-    master.connect(ctx.destination);
-    const body = ctx.createOscillator();
-    body.type = "sine";
+    const master = ctx.createGain(); master.gain.value = 0.7; master.connect(ctx.destination);
+    const body = ctx.createOscillator(); body.type = "sine";
     body.frequency.setValueAtTime(fundamentalHz * 1.06, now);
     body.frequency.exponentialRampToValueAtTime(fundamentalHz, now + 0.09);
     body.frequency.exponentialRampToValueAtTime(Math.max(fundamentalHz * 0.92, 20), now + duration);
     const bodyGain = ctx.createGain();
-    bodyGain.gain.setValueAtTime(1e-4, now);
-    bodyGain.gain.exponentialRampToValueAtTime(0.65, now + 0.01);
-    bodyGain.gain.exponentialRampToValueAtTime(1e-3, now + duration);
-    body.connect(bodyGain);
-    bodyGain.connect(master);
-    [topHz, bottomHz].forEach((f, i) => {
-      const partial = ctx.createOscillator();
-      partial.type = "triangle";
-      partial.frequency.setValueAtTime(f, now);
-      const pGain = ctx.createGain();
-      pGain.gain.setValueAtTime(1e-4, now);
-      pGain.gain.exponentialRampToValueAtTime(0.09, now + 0.01);
-      pGain.gain.exponentialRampToValueAtTime(5e-4, now + duration * 0.6);
-      partial.connect(pGain);
-      pGain.connect(master);
-      partial.start(now);
-      partial.stop(now + duration * 0.6);
+    bodyGain.gain.setValueAtTime(1e-4, now); bodyGain.gain.exponentialRampToValueAtTime(0.65, now + 0.01); bodyGain.gain.exponentialRampToValueAtTime(1e-3, now + duration);
+    body.connect(bodyGain); bodyGain.connect(master);
+    [topHz, bottomHz].forEach((f) => {
+      const partial = ctx.createOscillator(); partial.type = "triangle"; partial.frequency.setValueAtTime(f, now);
+      const pGain = ctx.createGain(); pGain.gain.setValueAtTime(1e-4, now); pGain.gain.exponentialRampToValueAtTime(0.09, now + 0.01); pGain.gain.exponentialRampToValueAtTime(5e-4, now + duration * 0.6);
+      partial.connect(pGain); pGain.connect(master); partial.start(now); partial.stop(now + duration * 0.6);
     });
     const bufferSize = ctx.sampleRate * 0.08;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-    const noiseFilter = ctx.createBiquadFilter();
-    noiseFilter.type = "bandpass";
-    noiseFilter.frequency.value = fundamentalHz * 3;
-    noiseFilter.Q.value = 0.6;
-    const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.5, now);
-    noiseGain.gain.exponentialRampToValueAtTime(1e-3, now + 0.09);
-    noise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(master);
-    body.start(now);
-    body.stop(now + duration);
-    noise.start(now);
-    noise.stop(now + 0.09);
+    const noise = ctx.createBufferSource(); noise.buffer = buffer;
+    const noiseFilter = ctx.createBiquadFilter(); noiseFilter.type = "bandpass"; noiseFilter.frequency.value = fundamentalHz * 3; noiseFilter.Q.value = 0.6;
+    const noiseGain = ctx.createGain(); noiseGain.gain.setValueAtTime(0.5, now); noiseGain.gain.exponentialRampToValueAtTime(1e-3, now + 0.09);
+    noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(master);
+    body.start(now); body.stop(now + duration); noise.start(now); noise.stop(now + 0.09);
   }
   const FILTER_SEMITONES = 1.5;
   const FILTER_BAND = Math.pow(2, FILTER_SEMITONES / 12);
@@ -414,18 +397,15 @@ function closeHelp() {
     }
     if (peaks.length === 0) return null;
     const groupGap = (f) => Math.max(8, f * 0.06);
-    const subsets = [];
-    let current = [peaks[0]];
+    const subsets = []; let current = [peaks[0]];
     for (let k = 1; k < peaks.length; k++) {
       if (peaks[k].freq - peaks[k - 1].freq <= groupGap(peaks[k - 1].freq)) current.push(peaks[k]);
       else { subsets.push(current); current = [peaks[k]]; }
     }
     subsets.push(current);
     const best = (arr) => arr.reduce((m, p) => p.db > m.db ? p : m);
-    const groups = subsets.map((s) => best(s));
-    return { groups };
+    return { groups: subsets.map((s) => best(s)) };
   }
-  // Membranmoden-Verhältnisse: (0,1)=1 → (1,1)≈1.59 → (2,1)≈2.14 → (0,2)≈2.30 → (3,1)≈2.65
   const MODE_RATIOS = [1.59, 2.14, 2.30, 2.65];
   function pickStrongestGroup(groups, filterHz = null) {
     const candidates = filterHz == null ? groups : groups.filter((g) => g.freq >= filterHz / FILTER_BAND && g.freq <= filterHz * FILTER_BAND);
@@ -443,27 +423,16 @@ function closeHelp() {
     const midi = Math.round(12 * Math.log2(hz / 440) + 69);
     return names[((midi % 12) + 12) % 12];
   }
-  const MIC_RANGE = {
-    "Bass Drum": { min: 30, max: 160 },
-    "Tom": { min: 50, max: 350 },
-    "Floor Tom": { min: 50, max: 350 },
-    "Snare": { min: 80, max: 450 }
-  };
+  const MIC_RANGE = { "Bass Drum": { min: 30, max: 160 }, "Tom": { min: 50, max: 350 }, "Floor Tom": { min: 50, max: 350 }, "Snare": { min: 80, max: 450 } };
   function getMicStream(deviceId) {
-    return navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, deviceId: deviceId ? { exact: deviceId } : void 0 }
-    });
+    return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, deviceId: deviceId ? { exact: deviceId } : void 0 } });
   }
   function MicMeasureButton({ targetHz, accent = "#c9a15a", deviceId = "", minHz = 20, maxHz = 1e3, labels }) {
     const [status, setStatus] = useState("idle");
     const [result, setResult] = useState(null);
     const [errorMsg, setErrorMsg] = useState("");
     const [filterHz, setFilterHz] = useState(null);
-    const stopFnRef = useRef(null);
-    const rafRef = useRef(null);
-    const armedRef = useRef(true);
-    const pendingRef = useRef(null);
-    const filterRef = useRef(null);
+    const stopFnRef = useRef(null), rafRef = useRef(null), armedRef = useRef(true), pendingRef = useRef(null), filterRef = useRef(null);
     const stopListening = () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (pendingRef.current) { clearTimeout(pendingRef.current); pendingRef.current = null; }
@@ -484,30 +453,23 @@ function closeHelp() {
         else { setStatus("error"); setErrorMsg(e1.name || String(e1)); return; }
       }
       try {
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        const ctx = new Ctx();
+        const Ctx = window.AudioContext || window.webkitAudioContext, ctx = new Ctx();
         const source = ctx.createMediaStreamSource(stream);
         const spec = ctx.createAnalyser(); spec.fftSize = 32768; spec.smoothingTimeConstant = 0;
         const fast = ctx.createAnalyser(); fast.fftSize = 2048;
         source.connect(spec); source.connect(fast);
-        const timeBuf = new Float32Array(fast.fftSize);
-        const freqBuf = new Float32Array(spec.frequencyBinCount);
+        const timeBuf = new Float32Array(fast.fftSize), freqBuf = new Float32Array(spec.frequencyBinCount);
         const sampleRate = ctx.sampleRate;
         stopFnRef.current = () => { stream.getTracks().forEach((t) => t.stop()); ctx.close(); };
         const takeSnapshot = () => {
           pendingRef.current = null;
           spec.getFloatFrequencyData(freqBuf);
           const res = analyzeSpectrum(freqBuf, sampleRate, spec.fftSize, minHz, maxHz);
-          if (res && res.groups.length) {
-            const value = pickStrongestGroup(res.groups, filterRef.current);
-            setResult({ value, groups: res.groups.map((g) => g.freq) });
-          }
+          if (res && res.groups.length) { const value = pickStrongestGroup(res.groups, filterRef.current); setResult({ value, groups: res.groups.map((g) => g.freq) }); }
         };
         const loop = () => {
           fast.getFloatTimeDomainData(timeBuf);
-          let rms = 0;
-          for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i];
-          rms = Math.sqrt(rms / timeBuf.length);
+          let rms = 0; for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i]; rms = Math.sqrt(rms / timeBuf.length);
           if (armedRef.current && rms > 0.03) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshot, 450); }
           else if (!armedRef.current && !pendingRef.current && rms < 0.02) { armedRef.current = true; }
           rafRef.current = requestAnimationFrame(loop);
@@ -542,19 +504,9 @@ function closeHelp() {
     );
   }
   const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-  function noteToHz(noteName, octave) {
-    const semitone = NOTE_NAMES.indexOf(noteName);
-    const midi = 12 * (octave + 1) + semitone;
-    return 440 * Math.pow(2, (midi - 69) / 12);
-  }
+  function noteToHz(noteName, octave) { const semitone = NOTE_NAMES.indexOf(noteName); const midi = 12 * (octave + 1) + semitone; return 440 * Math.pow(2, (midi - 69) / 12); }
   const DRUM_TYPES = ["Bass Drum", "Tom", "Floor Tom", "Snare"];
-  const RESONANCE_MODES = {
-    maximum: { label: "Maximum (Unisono)", high: 1.75, low: 1.75 },
-    high: { label: "High", high: 1.85, low: 1.5 },
-    medium: { label: "Medium", high: 2, low: 1.4 },
-    low: { label: "Low", high: 2.3, low: 1.2 },
-    pro: { label: "Profi-Durchschnitt (empirisch)", high: null, low: null }
-  };
+  const RESONANCE_MODES = { maximum: { label: "Maximum (Unisono)", high: 1.75, low: 1.75 }, high: { label: "High", high: 1.85, low: 1.5 }, medium: { label: "Medium", high: 2, low: 1.4 }, low: { label: "Low", high: 2.3, low: 1.2 }, pro: { label: "Profi-Durchschnitt (empirisch)", high: null, low: null } };
   const PRO_AVERAGE = { "Bass Drum": { high: 1.82, low: 1.62 }, "Tom": { high: 1.92, low: 1.6 }, "Floor Tom": { high: 1.92, low: 1.6 } };
   const DRUM_PRESETS = [
     { name: '22" Bass Drum', type: "Bass Drum", diameter: 22, lugs: 10, note: "C", octave: 2 },
@@ -563,13 +515,7 @@ function closeHelp() {
     { name: '14" Dynasonic', type: "Snare", diameter: 14, lugs: 10, note: "D#", octave: 3 }
   ];
   const SNARE_TOP_BASE = 1.4;
-  const SNARE_INTERVALS = {
-    fifth: { label: "Perfekte Quinte", ratio: 1.5, topBase: null },
-    fourth: { label: "Perfekte Quarte", ratio: 1.333, topBase: null },
-    third: { label: "Gro\xDFe Terz", ratio: 1.26, topBase: null },
-    unison: { label: "Unisono (Maximum Resonance)", ratio: 1, topBase: null },
-    pro: { label: "Profi-Durchschnitt (empirisch, n=22)", ratio: 1.29, topBase: 1.47 }
-  };
+  const SNARE_INTERVALS = { fifth: { label: "Perfekte Quinte", ratio: 1.5, topBase: null }, fourth: { label: "Perfekte Quarte", ratio: 1.333, topBase: null }, third: { label: "Gro\xDFe Terz", ratio: 1.26, topBase: null }, unison: { label: "Unisono (Maximum Resonance)", ratio: 1, topBase: null }, pro: { label: "Profi-Durchschnitt (empirisch, n=22)", ratio: 1.29, topBase: 1.47 } };
   function computeLugFreqs(fundamentalHz, mode, higherHead, type, calibratedA) {
     const m = mode === "pro" ? PRO_AVERAGE[type] || PRO_AVERAGE["Tom"] : RESONANCE_MODES[mode];
     let highMult, lowMult, calibrated = false;
@@ -580,12 +526,11 @@ function closeHelp() {
     return higherHead === "top" ? { top: highFreq, bottom: lowFreq, calibrated } : { top: lowFreq, bottom: highFreq, calibrated };
   }
   function computeSnareLugFreqs(fundamentalHz, intervalKey, calibratedA) {
-    var _a, _b;
-    const interval = (_a = SNARE_INTERVALS[intervalKey]) != null ? _a : SNARE_INTERVALS.fifth;
+    const interval = SNARE_INTERVALS[intervalKey] ?? SNARE_INTERVALS.fifth;
     let scale = 1, calibrated = false;
     if (calibratedA && calibratedA > 0) { scale = calibratedA / 1.75; calibrated = true; }
     if (intervalKey === "unison") { const both = fundamentalHz * 1.75 * scale; return { top: both, bottom: both, calibrated, overLimit: both > 400 }; }
-    const top = fundamentalHz * ((_b = interval.topBase) != null ? _b : SNARE_TOP_BASE) * scale;
+    const top = fundamentalHz * (interval.topBase ?? SNARE_TOP_BASE) * scale;
     const bottom = top * interval.ratio;
     return { top, bottom, calibrated, overLimit: bottom > 400 };
   }
@@ -600,10 +545,7 @@ function closeHelp() {
   }
   function LugRing({ lugs, topHz, idPrefix }) {
     const size = 220, c = size / 2, r = 82;
-    const points = Array.from({ length: lugs }, (_, i) => {
-      const angle = i / lugs * 2 * Math.PI - Math.PI / 2;
-      return { x: c + r * Math.cos(angle), y: c + r * Math.sin(angle) };
-    });
+    const points = Array.from({ length: lugs }, (_, i) => { const angle = i / lugs * 2 * Math.PI - Math.PI / 2; return { x: c + r * Math.cos(angle), y: c + r * Math.sin(angle) }; });
     const order = computeTuningOrder(lugs);
     const byStep = new Array(lugs);
     order.forEach((step, idx) => { byStep[step - 1] = points[idx]; });
@@ -611,16 +553,10 @@ function closeHelp() {
     return /* @__PURE__ */ React.createElement("svg", { width: size, height: size, className: "shrink-0" },
       /* @__PURE__ */ React.createElement("defs", null, /* @__PURE__ */ React.createElement("marker", { id: arrowId, viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "6", markerHeight: "6", orient: "auto-start-reverse" }, /* @__PURE__ */ React.createElement("path", { d: "M2 1L8 5L2 9", fill: "none", stroke: "#c9a15a", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" }))),
       /* @__PURE__ */ React.createElement("circle", { cx: c, cy: c, r: r + 16, fill: "none", stroke: "#5c4a33", strokeWidth: "1", opacity: "0.4" }),
-      byStep.slice(0, -1).map((p, i) => {
-        const next = byStep[i + 1];
-        return /* @__PURE__ */ React.createElement("line", { key: i, x1: p.x, y1: p.y, x2: next.x, y2: next.y, stroke: "#c9a15a", strokeWidth: "1.5", opacity: "0.85", markerEnd: `url(#${arrowId})` });
-      }),
+      byStep.slice(0, -1).map((p, i) => { const next = byStep[i + 1]; return /* @__PURE__ */ React.createElement("line", { key: i, x1: p.x, y1: p.y, x2: next.x, y2: next.y, stroke: "#c9a15a", strokeWidth: "1.5", opacity: "0.85", markerEnd: `url(#${arrowId})` }); }),
       /* @__PURE__ */ React.createElement("circle", { cx: c, cy: c, r: 34, fill: "#241b13", stroke: "#c9a15a", strokeWidth: "2" }),
       /* @__PURE__ */ React.createElement("text", { x: c, y: c, textAnchor: "middle", dominantBaseline: "central", fill: "#e8dcc4", fontSize: "12", fontFamily: "ui-monospace, monospace" }, topHz.toFixed(0), " Hz"),
-      points.map((p, i) => /* @__PURE__ */ React.createElement("g", { key: i },
-        /* @__PURE__ */ React.createElement("circle", { cx: p.x, cy: p.y, r: "11", fill: "#3a2c1a", stroke: "#c9a15a", strokeWidth: "1.5" }),
-        /* @__PURE__ */ React.createElement("text", { x: p.x, y: p.y, textAnchor: "middle", dominantBaseline: "central", fill: "#e8dcc4", fontSize: "10", fontWeight: "bold" }, order[i])
-      ))
+      points.map((p, i) => /* @__PURE__ */ React.createElement("g", { key: i }, /* @__PURE__ */ React.createElement("circle", { cx: p.x, cy: p.y, r: "11", fill: "#3a2c1a", stroke: "#c9a15a", strokeWidth: "1.5" }), /* @__PURE__ */ React.createElement("text", { x: p.x, y: p.y, textAnchor: "middle", dominantBaseline: "central", fill: "#e8dcc4", fontSize: "10", fontWeight: "bold" }, order[i])))
     );
   }
   function TunebotCalculator() {
@@ -630,21 +566,13 @@ function closeHelp() {
     const [micDeviceId, setMicDeviceId] = useState("");
     const [micDevices, setMicDevices] = useState([]);
     const loadMicDevices = async () => {
-      try {
-        const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-        s.getTracks().forEach((t2) => t2.stop());
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        setMicDevices(devices.filter((d) => d.kind === "audioinput"));
-      } catch (e) {}
+      try { const s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach((t2) => t2.stop()); const devices = await navigator.mediaDevices.enumerateDevices(); setMicDevices(devices.filter((d) => d.kind === "audioinput")); } catch (e) {}
     };
-    const handlePlay = (freqHz) => { const ctx = getAudioCtx(audioCtxRef); playTone(ctx, freqHz); };
-    const handlePlayDrum = (fundamentalHz, topHz, bottomHz) => { const ctx = getAudioCtx(audioCtxRef); playDrumTone(ctx, fundamentalHz, topHz, bottomHz); };
-    const handlePrint = () => {
-      const prevTitle = document.title;
-      document.title = `Fellton - ${setName || (lang === "de" ? "Set" : "Kit")}`;
-      window.print();
-      document.title = prevTitle;
-    };
+    const handlePlay = (freqHz) => { playTone(getAudioCtx(audioCtxRef), freqHz); };
+    const handlePlayDrum = (fundamentalHz, topHz, bottomHz) => { playDrumTone(getAudioCtx(audioCtxRef), fundamentalHz, topHz, bottomHz); };
+    const handlePrint = () => { const prevTitle = document.title; document.title = `Fellton - ${setName || (lang === "de" ? "Set" : "Kit")}`; window.print(); document.title = prevTitle; };
+    const handleHelp = () => { openHelp(lang); };
+    const handleLang = (l) => { setLang(l); if (document.getElementById('helpPanel').classList.contains('open')) openHelp(l); };
     const [setName, setSetName] = useState("Rogers XP8");
     const [drums, setDrums] = useState(DRUM_PRESETS.map((d, i) => ({ id: i, ...d, diameterInput: String(d.diameter).replace(".", ","), mode: "high", higherHead: "bottom", snareInterval: "fifth", calibratedA: null, calibLugInput: "", calibFundInput: "", showCalib: false })));
     const addDrum = () => { setDrums([...drums, { id: nextId++, name: "Neue Trommel", type: "Tom", diameter: 12, diameterInput: "12", lugs: 6, note: "A", octave: 2, mode: "high", higherHead: "bottom", snareInterval: "fifth", calibratedA: null, calibLugInput: "", calibFundInput: "", showCalib: false }]); };
@@ -683,20 +611,21 @@ function closeHelp() {
             /* @__PURE__ */ React.createElement("p", { className: "print-only text-xs text-[#6b5d47] mt-2" }, t.printedOn, " ", (/* @__PURE__ */ new Date()).toLocaleDateString(lang === "de" ? "de-DE" : "en-US")),
             /* @__PURE__ */ React.createElement("div", { className: "no-print mt-4 flex items-center gap-3 flex-wrap border border-[#5c4a33] bg-[#211910] rounded-md px-4 py-3" },
               /* @__PURE__ */ React.createElement("span", { className: "text-[#c9a15a] text-xs uppercase tracking-wide font-semibold" }, t.micLabel),
-              micDevices.length === 0 ? /* @__PURE__ */ React.createElement("button", { onClick: loadMicDevices, className: "text-xs uppercase tracking-wide text-[#1a140d] bg-[#c9a15a] border border-[#c9a15a] rounded-sm px-3 py-1.5 hover:bg-[#e8c07a] transition-colors font-semibold" }, t.loadDevices)
-              : /* @__PURE__ */ React.createElement("select", { value: micDeviceId, onChange: (e) => setMicDeviceId(e.target.value), className: "bg-[#170f09] border border-[#c9a15a] rounded-sm px-3 py-1.5 text-sm outline-none focus:border-[#e8c07a] text-[#e8dcc4]" },
-                /* @__PURE__ */ React.createElement("option", { value: "" }, t.defaultMic),
-                micDevices.map((d) => /* @__PURE__ */ React.createElement("option", { key: d.deviceId, value: d.deviceId }, d.label || t.micFallback))
-              )
+              micDevices.length === 0
+                ? /* @__PURE__ */ React.createElement("button", { onClick: loadMicDevices, className: "text-xs uppercase tracking-wide text-[#1a140d] bg-[#c9a15a] border border-[#c9a15a] rounded-sm px-3 py-1.5 hover:bg-[#e8c07a] transition-colors font-semibold" }, t.loadDevices)
+                : /* @__PURE__ */ React.createElement("select", { value: micDeviceId, onChange: (e) => setMicDeviceId(e.target.value), className: "bg-[#170f09] border border-[#c9a15a] rounded-sm px-3 py-1.5 text-sm outline-none focus:border-[#e8c07a] text-[#e8dcc4]" },
+                  /* @__PURE__ */ React.createElement("option", { value: "" }, t.defaultMic),
+                  micDevices.map((d) => /* @__PURE__ */ React.createElement("option", { key: d.deviceId, value: d.deviceId }, d.label || t.micFallback))
+                )
             )
           ),
-          /* @__PURE__ */ React.createElement("div", { className: "no-print shrink-0 flex items-center gap-3" },
-            /* @__PURE__ */ React.createElement("div", { className: "flex border border-[#5c4a33] rounded-sm overflow-hidden" },
-              /* @__PURE__ */ React.createElement("button", { onClick: () => setLang("de"), className: `text-xs uppercase tracking-wide px-3 py-2 transition-colors ${lang === "de" ? "bg-[#c9a15a] text-[#1a140d]" : "text-[#c9a15a] hover:bg-[#3a2c1a]"}` }, "DE"),
-              /* @__PURE__ */ React.createElement("button", { onClick: () => setLang("en"), className: `text-xs uppercase tracking-wide px-3 py-2 transition-colors ${lang === "en" ? "bg-[#c9a15a] text-[#1a140d]" : "text-[#c9a15a] hover:bg-[#3a2c1a]"}` }, "EN")
+          /* @__PURE__ */ React.createElement("div", { className: "no-print shrink-0 flex items-center gap-2 flex-nowrap" },
+            /* @__PURE__ */ React.createElement("div", { className: "flex border border-[#5c4a33] rounded-sm overflow-hidden flex-shrink-0" },
+              /* @__PURE__ */ React.createElement("button", { onClick: () => handleLang("de"), className: `text-xs uppercase tracking-wide px-3 py-2 transition-colors ${lang === "de" ? "bg-[#c9a15a] text-[#1a140d]" : "text-[#c9a15a] hover:bg-[#3a2c1a]"}` }, "DE"),
+              /* @__PURE__ */ React.createElement("button", { onClick: () => handleLang("en"), className: `text-xs uppercase tracking-wide px-3 py-2 transition-colors ${lang === "en" ? "bg-[#c9a15a] text-[#1a140d]" : "text-[#c9a15a] hover:bg-[#3a2c1a]"}` }, "EN")
             ),
-            /* @__PURE__ */ React.createElement("button", { onClick: handlePrint, className: "text-xs uppercase tracking-wide border border-[#c9a15a] text-[#c9a15a] rounded-sm px-4 py-2.5 hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors" }, t.printButton),
-            /* @__PURE__ */ React.createElement("button", { onClick: () => openHelp(), className: "text-xs uppercase tracking-wide border border-[#c9a15a] text-[#c9a15a] rounded-sm px-4 py-2.5 hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors" }, t.helpButton)
+            /* @__PURE__ */ React.createElement("button", { onClick: handlePrint, className: "flex-shrink-0 text-xs uppercase tracking-wide border border-[#c9a15a] text-[#c9a15a] rounded-sm px-3 py-2.5 hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors whitespace-nowrap" }, t.printButton),
+            /* @__PURE__ */ React.createElement("button", { onClick: handleHelp, className: "flex-shrink-0 text-xs uppercase tracking-wide border border-[#c9a15a] text-[#c9a15a] rounded-sm px-3 py-2.5 hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors whitespace-nowrap" }, t.helpButton)
           )
         )
       ),
@@ -734,12 +663,12 @@ function closeHelp() {
                     )
                   )
                 ),
-                isSnare ? /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 gap-3 text-sm" },
-                  /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.intervalLabel), /* @__PURE__ */ React.createElement("select", { value: d.snareInterval, onChange: (e) => updateDrum(d.id, { snareInterval: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, Object.entries(SNARE_INTERVALS).map(([key]) => /* @__PURE__ */ React.createElement("option", { key, value: key }, t.snareIntervals[key].label))))
-                ) : /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm" },
-                  /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.resonanceModeLabel), /* @__PURE__ */ React.createElement("select", { value: d.mode, onChange: (e) => updateDrum(d.id, { mode: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, Object.entries(RESONANCE_MODES).map(([key]) => /* @__PURE__ */ React.createElement("option", { key, value: key }, t.modes[key].label)))),
-                  d.mode !== "maximum" && /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.higherHeadLabel), /* @__PURE__ */ React.createElement("select", { value: d.higherHead, onChange: (e) => updateDrum(d.id, { higherHead: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, /* @__PURE__ */ React.createElement("option", { value: "bottom" }, t.resoLower), /* @__PURE__ */ React.createElement("option", { value: "top" }, t.battTop)))
-                ),
+                isSnare
+                  ? /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 gap-3 text-sm" }, /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.intervalLabel), /* @__PURE__ */ React.createElement("select", { value: d.snareInterval, onChange: (e) => updateDrum(d.id, { snareInterval: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, Object.entries(SNARE_INTERVALS).map(([key]) => /* @__PURE__ */ React.createElement("option", { key, value: key }, t.snareIntervals[key].label)))))
+                  : /* @__PURE__ */ React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm" },
+                    /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.resonanceModeLabel), /* @__PURE__ */ React.createElement("select", { value: d.mode, onChange: (e) => updateDrum(d.id, { mode: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, Object.entries(RESONANCE_MODES).map(([key]) => /* @__PURE__ */ React.createElement("option", { key, value: key }, t.modes[key].label)))),
+                    d.mode !== "maximum" && /* @__PURE__ */ React.createElement("label", { className: "flex flex-col gap-1" }, /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs uppercase tracking-wide" }, t.higherHeadLabel), /* @__PURE__ */ React.createElement("select", { value: d.higherHead, onChange: (e) => updateDrum(d.id, { higherHead: e.target.value }), className: "bg-[#170f09] border border-[#3a2c1a] rounded-sm px-2 py-1.5 outline-none focus:border-[#c9a15a]" }, /* @__PURE__ */ React.createElement("option", { value: "bottom" }, t.resoLower), /* @__PURE__ */ React.createElement("option", { value: "top" }, t.battTop)))
+                  ),
                 /* @__PURE__ */ React.createElement("p", { className: "text-xs text-[#8a7a5f] italic" }, isSnare ? d.snareInterval === "pro" ? t.snareDescPro : t.snareDescDefault : d.mode === "pro" ? t.modeDescPro : t.modes[d.mode].desc),
                 isSnare && overLimit && /* @__PURE__ */ React.createElement("p", { className: "text-xs text-[#c1666b]" }, t.overLimitWarning),
                 /* @__PURE__ */ React.createElement("div", { className: "flex gap-6 pt-2 border-t border-[#3a2c1a] items-start flex-wrap" },
