@@ -709,12 +709,13 @@
       // Membranmoden-Verhältnisse: (0,1)=1 → (1,1)≈1.59 → (2,1)≈2.14 → (0,2)≈2.30 → (3,1)≈2.65
       // Tiefste Gruppe wählen, die durch mindestens eine Obermode bestätigt wird (±8 %).
       // Fallback: einfach tiefste Gruppe.
-      const MODE_RATIOS_LIVE = [1.59, 2.14, 2.30, 2.65];
+      const TOLERANCE_CENTS_LIVE = 50;
+      const MODE_RATIOS_CENTS_LIVE = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
       const sortedLive = [...groups].sort((a, b) => a.freq - b.freq);
       let strongest = sortedLive[0];
       for (const cand of sortedLive) {
-        const confirmed = MODE_RATIOS_LIVE.some(r =>
-          sortedLive.some(g => Math.abs(g.freq / cand.freq - r) / r < 0.08)
+        const confirmed = MODE_RATIOS_CENTS_LIVE.some(tc =>
+          sortedLive.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_LIVE)
         );
         if (confirmed) { strongest = cand; break; }
       }
@@ -737,12 +738,13 @@
         const snapRMS = calcRMS(t2);
         if (snap && snap.groups.length) {
           // Identische Logik wie Live-Anzeige: tiefste moden-bestätigte Gruppe
-          const MODE_RATIOS_SNAP = [1.59, 2.14, 2.30, 2.65];
+          const TOLERANCE_CENTS_SNAP = 50;
+          const MODE_RATIOS_CENTS_SNAP = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
           const sortedSnap = [...snap.groups].sort((a, b) => a.freq - b.freq);
           let snapMain = sortedSnap[0];
           for (const cand of sortedSnap) {
-            const confirmed = MODE_RATIOS_SNAP.some(r =>
-              sortedSnap.some(g => Math.abs(g.freq / cand.freq - r) / r < 0.08)
+            const confirmed = MODE_RATIOS_CENTS_SNAP.some(tc =>
+              sortedSnap.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_SNAP)
             );
             if (confirmed) { snapMain = cand; break; }
           }

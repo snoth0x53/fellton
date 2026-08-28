@@ -190,7 +190,7 @@ function closeHelp() {
       defaultMic: "Standard-Mikrofon",
       micFallback: "Mikrofon",
       printButton: "\u{1F5A8} Drucken / Als PDF speichern",
-      helpButton: "?",
+      helpButton: "? Hilfe",
       remove: "Entfernen",
       typeLabel: "Typ",
       diameterLabel: '\xD8 (")',
@@ -268,7 +268,7 @@ function closeHelp() {
       setLabel: "Kit:", setPlaceholder: "e.g. Rogers XP8, second kit...",
       printedOn: "Printed on", micLabel: "\u{1F3A4} Microphone:",
       loadDevices: "Load devices", defaultMic: "Default microphone", micFallback: "Microphone",
-      printButton: "\u{1F5A8} Print / Save as PDF", helpButton: "?",
+      printButton: "\u{1F5A8} Print / Save as PDF", helpButton: "? Help",
       remove: "Remove", typeLabel: "Type", diameterLabel: '\xD8 (")',
       lugsLabel: "Lugs", noteLabel: "Note", octaveLabel: "Octave",
       calibratedActive: "Calibrated coefficient active: a =",
@@ -406,14 +406,17 @@ function closeHelp() {
     const best = (arr) => arr.reduce((m, p) => p.db > m.db ? p : m);
     return { groups: subsets.map((s) => best(s)) };
   }
-  const MODE_RATIOS = [1.59, 2.14, 2.30, 2.65];
+  const TOLERANCE_CENTS = 50; // ±Viertelton — musikalisch definiert statt prozentual
+  const MODE_RATIOS_CENTS = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
   function pickStrongestGroup(groups, filterHz = null) {
     const candidates = filterHz == null ? groups : groups.filter((g) => g.freq >= filterHz / FILTER_BAND && g.freq <= filterHz * FILTER_BAND);
     if (candidates.length === 0) return null;
     if (candidates.length === 1) return candidates[0].freq;
     const sorted = [...candidates].sort((a, b) => a.freq - b.freq);
     for (const cand of sorted) {
-      const confirmed = MODE_RATIOS.some(r => sorted.some(g => Math.abs(g.freq / cand.freq - r) / r < 0.08));
+      const confirmed = MODE_RATIOS_CENTS.some(tc =>
+        sorted.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS)
+      );
       if (confirmed) return cand.freq;
     }
     return sorted[0].freq;
@@ -625,7 +628,7 @@ function closeHelp() {
               /* @__PURE__ */ React.createElement("button", { onClick: () => handleLang("en"), className: `text-xs uppercase tracking-wide px-3 py-2 transition-colors ${lang === "en" ? "bg-[#c9a15a] text-[#1a140d]" : "text-[#c9a15a] hover:bg-[#3a2c1a]"}` }, "EN")
             ),
             /* @__PURE__ */ React.createElement("button", { onClick: handlePrint, className: "flex-shrink-0 text-xs uppercase tracking-wide border border-[#c9a15a] text-[#c9a15a] rounded-sm px-3 py-2.5 hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors whitespace-nowrap" }, t.printButton),
-            /* @__PURE__ */ React.createElement("button", { onClick: handleHelp, className: "flex-shrink-0 w-9 h-9 rounded-full border border-[#c9a15a] text-[#c9a15a] hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors font-semibold text-sm flex items-center justify-center" }, t.helpButton)
+            /* @__PURE__ */ React.createElement("button", { onClick: handleHelp, className: "flex-shrink-0 text-xs uppercase tracking-wide border border-[#c9a15a] text-[#c9a15a] rounded-sm px-3 py-2.5 hover:bg-[#c9a15a] hover:text-[#1a140d] transition-colors whitespace-nowrap" }, t.helpButton)
           )
         )
       ),
