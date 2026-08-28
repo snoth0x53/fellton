@@ -8,6 +8,8 @@ Build-Step, kein Backend – läuft komplett im Browser, auch offline.
 > **Lizenz:** MIT — kostenlos nutzbar und veränderbar, Namensnennung erforderlich.
 > Kommerzielle Nutzung bitte vorher anfragen.
 
+📖 **[Benutzeranleitung](ANLEITUNG.md)**
+
 ## Was das Tool macht
 
 - Grundton (Note + Oktave) und Resonance-Modus pro Trommel einstellen
