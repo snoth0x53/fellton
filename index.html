@@ -412,7 +412,7 @@ function closeHelp() {
     groups.sort((a, b) => a.freq - b.freq);
     return { groups };
   }
-  const TOLERANCE_CENTS = 50; // ±Viertelton — musikalisch definiert statt prozentual
+  const TOLERANCE_CENTS = 35; // ±35 Cents — enger als Viertelton, verhindert Körperschall-Bestätigung
   const MODE_RATIOS_CENTS = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
   function pickStrongestGroup(groups, filterHz = null) {
     const candidates = filterHz == null ? groups : groups.filter((g) => g.freq >= filterHz / FILTER_BAND && g.freq <= filterHz * FILTER_BAND);
