@@ -413,7 +413,9 @@
     }
     subsets.push(current);
     const best = (arr) => arr.reduce((m, p) => p.db > m.db ? p : m);
-    return { groups: subsets.map(s => ({ freq: best(s).freq, db: best(s).db })) };
+    const groups = subsets.map(s => ({ freq: best(s).freq, db: best(s).db }));
+    groups.sort((a, b) => a.freq - b.freq);
+    return { groups };
   }
 
   // ── Sound Score — pegelunabhängig normalisiert ────────────────────────────
@@ -742,6 +744,9 @@
         const snap    = analyzeSpectrum(d2, audioCtx.sampleRate, analyser.fftSize);
         const yinSnap = detectPitch(t2, audioCtx.sampleRate);
         const snapRMS = calcRMS(t2);
+        // Snapshot nur loggen wenn Pegel beim Anschlag hoch genug — filtert
+        // Raumresonanzen und Körperschall bei zu schwachem Signal raus
+        if (snapRMS < 0.001) return;
         if (snap && snap.groups.length) {
           // Identische Logik wie Live-Anzeige: tiefste moden-bestätigte Gruppe
           const TOLERANCE_CENTS_SNAP = 50;
