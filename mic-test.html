@@ -715,12 +715,12 @@
 
     if (groups.length) {
       // Membranmoden-Verhältnisse: (0,1)=1 → (1,1)≈1.59 → (2,1)≈2.14 → (0,2)≈2.30 → (3,1)≈2.65
-      // Tiefste Gruppe wählen, die durch mindestens eine Obermode bestätigt wird (±8 %).
-      // Fallback: einfach tiefste Gruppe.
+      // Tiefste moden-bestätigte Gruppe wählen.
+      // Fallback: stärkste Gruppe (nicht tiefste) — verhindert 100Hz-Phantom bei hohen Stimmungen.
       const TOLERANCE_CENTS_LIVE = 50;
       const MODE_RATIOS_CENTS_LIVE = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
       const sortedLive = [...groups].sort((a, b) => a.freq - b.freq);
-      let strongest = sortedLive[0];
+      let strongest = groups.reduce((m, g) => g.db > m.db ? g : m);
       for (const cand of sortedLive) {
         const confirmed = MODE_RATIOS_CENTS_LIVE.some(tc =>
           sortedLive.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_LIVE)
@@ -752,7 +752,7 @@
           const TOLERANCE_CENTS_SNAP = 50;
           const MODE_RATIOS_CENTS_SNAP = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
           const sortedSnap = [...snap.groups].sort((a, b) => a.freq - b.freq);
-          let snapMain = sortedSnap[0];
+          let snapMain = snap.groups.reduce((m, g) => g.db > m.db ? g : m);
           for (const cand of sortedSnap) {
             const confirmed = MODE_RATIOS_CENTS_SNAP.some(tc =>
               sortedSnap.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_SNAP)
@@ -779,8 +779,8 @@
           });
           renderHitLog();
         }
-      }, 450);
-      setTimeout(() => { onsetActive = false; }, 800);
+      }, 100);
+      setTimeout(() => { onsetActive = false; }, 500);
     }
 
     rafId = requestAnimationFrame(loop);
