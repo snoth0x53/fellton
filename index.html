@@ -433,7 +433,7 @@ function closeHelp() {
     const midi = Math.round(12 * Math.log2(hz / 440) + 69);
     return names[((midi % 12) + 12) % 12];
   }
-  const MIC_RANGE = { "Bass Drum": { min: 30, max: 160 }, "Tom": { min: 50, max: 350 }, "Floor Tom": { min: 50, max: 350 }, "Snare": { min: 80, max: 450 } };
+  const MIC_RANGE = { "Bass Drum": { min: 30, max: 160 }, "Tom": { min: 50, max: 350 }, "Floor Tom": { min: 50, max: 350 }, "Snare": { min: 80, max: 600 } };
   function getMicStream(deviceId) {
     return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, deviceId: deviceId ? { exact: deviceId } : void 0 } });
   }
@@ -480,7 +480,7 @@ function closeHelp() {
         const loop = () => {
           fast.getFloatTimeDomainData(timeBuf);
           let rms = 0; for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i]; rms = Math.sqrt(rms / timeBuf.length);
-          if (armedRef.current && rms > 0.03) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshot, 150); }
+          if (armedRef.current && rms > 0.03) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshot, 80); }
           else if (!armedRef.current && !pendingRef.current && rms < 0.02) { armedRef.current = true; }
           rafRef.current = requestAnimationFrame(loop);
         };

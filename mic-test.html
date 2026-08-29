@@ -312,7 +312,7 @@
   let rafId = null, onsetActive = false, frozen = false;
   let hits = [], history = [];
   const HISTORY_SIZE = 6;
-  const MIN_HZ = 40, MAX_HZ = 500;
+  const MIN_HZ = 40, MAX_HZ = 600;
   const FFT_SIZE = 32768;
 
   function fitCanvas(canvas) {
@@ -777,7 +777,7 @@
           });
           renderHitLog();
         }
-      }, 150);
+      }, 80);
       setTimeout(() => { onsetActive = false; }, 500);
     }
 
