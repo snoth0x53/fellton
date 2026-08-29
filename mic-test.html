@@ -539,6 +539,7 @@
       const deviceId = deviceSelect.value || undefined;
       stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+                 echoCancellationType: 'browser', latency: 0,
                  deviceId: deviceId ? { exact: deviceId } : undefined },
       });
       await populateDevices();
@@ -725,7 +726,7 @@
     if (yinFreq > 0) yinDisplay.textContent = yinFreq.toFixed(1) + ' Hz (' + hzToNote(yinFreq) + ')';
 
     // Onset — abgesenkte Schwellen für schwächere Mikrofone
-    if (!onsetActive && rmsLive > 0.015) {
+    if (!onsetActive && rmsLive > 0.0001) {
       onsetActive = true;
       setTimeout(() => {
         if (!analyser) return;
@@ -769,8 +770,8 @@
           renderHitLog();
         }
       }, 450);
-    } else if (onsetActive && rmsLive < 0.010) {
-      onsetActive = false;
+      setTimeout(() => { onsetActive = false; }, 800);
+    }
     }
 
     rafId = requestAnimationFrame(loop);
