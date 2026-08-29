@@ -733,7 +733,7 @@
     if (yinFreq > 0) yinDisplay.textContent = yinFreq.toFixed(1) + ' Hz (' + hzToNote(yinFreq) + ')';
 
     // Onset — abgesenkte Schwellen für schwächere Mikrofone
-    if (!onsetActive && rmsLive > 0.0001) {
+    if (!onsetActive && rmsLive > 0.001) {
       onsetActive = true;
       setTimeout(() => {
         if (!analyser) return;
@@ -759,9 +759,7 @@
             );
             if (confirmed) { snapMain = cand; break; }
           }
-          const gs = [snapMain.freq, ...snap.groups
-            .filter(g => g !== snapMain)
-            .map(g => g.freq)];
+          const gs = snap.groups.map(g => g.freq).sort((a, b) => a - b);
           history.push(gs);
           if (history.length > HISTORY_SIZE) history.shift();
           const stableHz = pickStablePeak(history);
@@ -779,7 +777,7 @@
           });
           renderHitLog();
         }
-      }, 100);
+      }, 150);
       setTimeout(() => { onsetActive = false; }, 500);
     }
 
