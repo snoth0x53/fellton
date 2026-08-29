@@ -392,10 +392,14 @@ function closeHelp() {
         const denom = a - 2 * b + c;
         const delta = denom !== 0 ? 0.5 * (a - c) / denom : 0;
         peaks.push({ freq: (i + delta) * binHz, db: b });
-        if (peaks.length >= 24) break;
       }
     }
     if (peaks.length === 0) return null;
+    if (peaks.length > 24) {
+      peaks.sort((a, b) => b.db - a.db);
+      peaks.length = 24;
+      peaks.sort((a, b) => a.freq - b.freq);
+    }
     const groupGap = (f) => Math.max(8, f * 0.06);
     const subsets = []; let current = [peaks[0]];
     for (let k = 1; k < peaks.length; k++) {
@@ -404,7 +408,9 @@ function closeHelp() {
     }
     subsets.push(current);
     const best = (arr) => arr.reduce((m, p) => p.db > m.db ? p : m);
-    return { groups: subsets.map((s) => best(s)) };
+    const groups = subsets.map((s) => best(s));
+    groups.sort((a, b) => a.freq - b.freq);
+    return { groups };
   }
   const TOLERANCE_CENTS = 50; // ±Viertelton — musikalisch definiert statt prozentual
   const MODE_RATIOS_CENTS = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
@@ -413,13 +419,14 @@ function closeHelp() {
     if (candidates.length === 0) return null;
     if (candidates.length === 1) return candidates[0].freq;
     const sorted = [...candidates].sort((a, b) => a.freq - b.freq);
+    let result = candidates.reduce((m, g) => g.db > m.db ? g : m);
     for (const cand of sorted) {
       const confirmed = MODE_RATIOS_CENTS.some(tc =>
         sorted.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS)
       );
       if (confirmed) return cand.freq;
     }
-    return sorted[0].freq;
+    return result.freq;
   }
   function hzToNote(hz) {
     const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
@@ -473,7 +480,7 @@ function closeHelp() {
         const loop = () => {
           fast.getFloatTimeDomainData(timeBuf);
           let rms = 0; for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i]; rms = Math.sqrt(rms / timeBuf.length);
-          if (armedRef.current && rms > 0.03) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshot, 450); }
+          if (armedRef.current && rms > 0.03) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshot, 150); }
           else if (!armedRef.current && !pendingRef.current && rms < 0.02) { armedRef.current = true; }
           rafRef.current = requestAnimationFrame(loop);
         };
