@@ -422,7 +422,10 @@ function closeHelp() {
     let result = candidates.reduce((m, g) => g.db > m.db ? g : m);
     for (const cand of sorted) {
       const confirmed = MODE_RATIOS_CENTS.some(tc =>
-        sorted.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS)
+        sorted.some(g =>
+          Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS ||
+          Math.abs(1200 * Math.log2(cand.freq / g.freq) - tc) <= TOLERANCE_CENTS
+        )
       );
       if (confirmed) return cand.freq;
     }

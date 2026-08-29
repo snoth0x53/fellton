@@ -723,7 +723,10 @@
       let strongest = groups.reduce((m, g) => g.db > m.db ? g : m);
       for (const cand of sortedLive) {
         const confirmed = MODE_RATIOS_CENTS_LIVE.some(tc =>
-          sortedLive.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_LIVE)
+          sortedLive.some(g =>
+            Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_LIVE ||
+            Math.abs(1200 * Math.log2(cand.freq / g.freq) - tc) <= TOLERANCE_CENTS_LIVE
+          )
         );
         if (confirmed) { strongest = cand; break; }
       }
@@ -755,7 +758,10 @@
           let snapMain = snap.groups.reduce((m, g) => g.db > m.db ? g : m);
           for (const cand of sortedSnap) {
             const confirmed = MODE_RATIOS_CENTS_SNAP.some(tc =>
-              sortedSnap.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_SNAP)
+              sortedSnap.some(g =>
+                Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_SNAP ||
+                Math.abs(1200 * Math.log2(cand.freq / g.freq) - tc) <= TOLERANCE_CENTS_SNAP
+              )
             );
             if (confirmed) { snapMain = cand; break; }
           }
