@@ -394,10 +394,16 @@
         const denom = a - 2 * b + c;
         const delta = denom !== 0 ? 0.5 * (a - c) / denom : 0;
         peaks.push({ freq: (i + delta) * binHz, db: b });
-        if (peaks.length >= 24) break;
       }
     }
     if (peaks.length === 0) return null;
+    // Stärkste 24 Peaks behalten (nicht die tiefsten) — verhindert dass
+    // tiefe Störpeaks den Budget aufbrauchen bevor der Lug-Ton erreicht wird
+    if (peaks.length > 24) {
+      peaks.sort((a, b) => b.db - a.db);
+      peaks.length = 24;
+      peaks.sort((a, b) => a.freq - b.freq);
+    }
     const groupGap = (f) => Math.max(8, f * 0.06);
     const subsets = [];
     let current = [peaks[0]];
