@@ -539,7 +539,6 @@
       const deviceId = deviceSelect.value || undefined;
       stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false,
-                 echoCancellationType: 'browser', latency: 0,
                  deviceId: deviceId ? { exact: deviceId } : undefined },
       });
       await populateDevices();
