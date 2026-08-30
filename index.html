@@ -515,17 +515,45 @@ function closeHelp() {
         const timeBuf = new Float32Array(fast.fftSize), freqBuf = new Float32Array(spec.frequencyBinCount);
         const sampleRate = ctx.sampleRate;
         stopFnRef.current = () => { stream.getTracks().forEach((t) => t.stop()); ctx.close(); };
-        const takeSnapshot = () => {
+        const SNAP_OFFSETS = [60, 90, 120, 150];
+        const takeSnapshots = () => {
           pendingRef.current = null;
-          spec.getFloatFrequencyData(freqBuf);
-          const res = analyzeSpectrum(freqBuf, sampleRate, spec.fftSize, minHz, maxHz);
-          if (res && res.groups.length) { const value = pickStrongestGroup(res.groups, filterRef.current); setResult({ value, groups: res.groups.map((g) => g.freq) }); }
+          const snapResults = [];
+          let snapsDone = 0;
+          const processSnaps = () => {
+            if (snapResults.length < SNAP_OFFSETS.length) return;
+            // Kandidaten aus allen Snapshots sammeln
+            const buckets = {};
+            for (const s of snapResults) {
+              if (!s) continue;
+              const value = pickStrongestGroup(s.groups, filterRef.current);
+              if (value == null) continue;
+              const bucket = Math.round(value / 10) * 10;
+              if (!buckets[bucket]) buckets[bucket] = { count: 0, values: [], groups: s.groups };
+              buckets[bucket].count++;
+              buckets[bucket].values.push(value);
+            }
+            if (Object.keys(buckets).length === 0) return;
+            // Stabilsten Kandidaten wählen
+            const best = Object.values(buckets).reduce((m, b) => b.count > m.count ? b : m);
+            const value = best.values.reduce((a, b) => a + b, 0) / best.values.length;
+            setResult({ value, groups: best.groups.map((g) => g.freq) });
+          };
+          for (const offset of SNAP_OFFSETS) {
+            setTimeout(() => {
+              if (!spec) { snapResults.push(null); snapsDone++; if (snapsDone === SNAP_OFFSETS.length) processSnaps(); return; }
+              spec.getFloatFrequencyData(freqBuf);
+              const res = analyzeSpectrum(freqBuf, sampleRate, spec.fftSize, minHz, maxHz);
+              snapResults.push(res && res.groups.length ? { groups: res.groups } : null);
+              snapsDone++;
+              if (snapsDone === SNAP_OFFSETS.length) processSnaps();
+            }, offset);
+          }
         };
         const loop = () => {
           fast.getFloatTimeDomainData(timeBuf);
           let rms = 0; for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i]; rms = Math.sqrt(rms / timeBuf.length);
-          if (armedRef.current && rms > 0.02) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshot, 80); }
-          else if (!armedRef.current && !pendingRef.current && rms < 0.02) { armedRef.current = true; }
+          if (armedRef.current && rms > 0.02) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshots, 0); setTimeout(() => { armedRef.current = true; }, 600); }
           rafRef.current = requestAnimationFrame(loop);
         };
         loop();
