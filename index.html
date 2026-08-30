@@ -436,12 +436,15 @@ function closeHelp() {
       : Math.max(...candidates.map(g => g.db));
     const loud = (lugCandidates.length > 0 ? lugCandidates : sorted)
       .filter(g => g.db >= loudMaxDb - 10);
+    const confirmedCandidates = [];
     for (const cand of loud) {
       const confirmed = MODE_RATIOS_CENTS.some(tc =>
         sorted.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS)
       );
-      if (confirmed) return cand.freq;
+      if (confirmed) confirmedCandidates.push(cand);
     }
+    if (confirmedCandidates.length > 0)
+      return confirmedCandidates.reduce((m, g) => g.db > m.db ? g : m).freq;
     return result.freq;
   }
   function hzToNote(hz) {

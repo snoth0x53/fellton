@@ -730,12 +730,15 @@
         : Math.max(...groups.map(g => g.db));
       const loudLive = (lugCandidatesLive.length > 0 ? lugCandidatesLive : sortedLive)
         .filter(g => g.db >= loudMaxDbLive - 10);
+      const confirmedLive = [];
       for (const cand of loudLive) {
         const confirmed = MODE_RATIOS_CENTS_LIVE.some(tc =>
           sortedLive.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_LIVE)
         );
-        if (confirmed) { strongest = cand; break; }
+        if (confirmed) confirmedLive.push(cand);
       }
+      if (confirmedLive.length > 0)
+        strongest = confirmedLive.reduce((m, g) => g.db > m.db ? g : m);
       pitchDisplay.textContent = strongest.freq.toFixed(1) + ' Hz (' + hzToNote(strongest.freq) + ')';
       peakList.textContent = groups.map(g => g.freq.toFixed(0)).join(' · ') + ' Hz';
     }
@@ -770,12 +773,15 @@
             : Math.max(...snap.groups.map(g => g.db));
           const loudSnap = (lugCandidatesSnap.length > 0 ? lugCandidatesSnap : sortedSnap)
             .filter(g => g.db >= loudMaxDbSnap - 10);
+          const confirmedSnap = [];
           for (const cand of loudSnap) {
             const confirmed = MODE_RATIOS_CENTS_SNAP.some(tc =>
               sortedSnap.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_SNAP)
             );
-            if (confirmed) { snapMain = cand; break; }
+            if (confirmed) confirmedSnap.push(cand);
           }
+          if (confirmedSnap.length > 0)
+            snapMain = confirmedSnap.reduce((m, g) => g.db > m.db ? g : m);
           const gs = [...snap.groups].sort((a, b) => a.freq - b.freq);
           history.push(gs.map(g => g.freq));
           if (history.length > HISTORY_SIZE) history.shift();
