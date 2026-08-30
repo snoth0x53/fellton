@@ -481,7 +481,7 @@ function closeHelp() {
   function getMicStream(deviceId) {
     return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, deviceId: deviceId ? { exact: deviceId } : void 0 } });
   }
-  function MicMeasureButton({ targetHz, accent = "#c9a15a", deviceId = "", minHz = 20, maxHz = 1e3, labels }) {
+  function MicMeasureButton({ targetTop, targetBottom, accent = "#c9a15a", deviceId = "", minHz = 20, maxHz = 1e3, labels }) {
     const [status, setStatus] = useState("idle");
     const [result, setResult] = useState(null);
     const [errorMsg, setErrorMsg] = useState("");
@@ -561,6 +561,10 @@ function closeHelp() {
     };
     const displayed = result ? result.value : null;
     const noMatch = result != null && result.value == null && filterHz != null;
+    // Nächstliegendes Ziel wählen — automatisch Schlagfell oder Resofell
+    const targetHz = displayed != null && targetTop != null && targetBottom != null
+      ? (Math.abs(displayed - targetTop) <= Math.abs(displayed - targetBottom) ? targetTop : targetBottom)
+      : (targetTop ?? targetBottom ?? null);
     const delta = displayed != null && targetHz != null ? displayed - targetHz : null;
     const deltaPct = delta != null ? Math.abs(delta / targetHz) * 100 : null;
     const close = deltaPct != null && deltaPct < 2;
@@ -760,7 +764,7 @@ function closeHelp() {
                 ),
                 /* @__PURE__ */ React.createElement("div", { className: "pt-1" },
                   /* @__PURE__ */ React.createElement("p", { className: "text-[#a8977b] text-[10px] uppercase tracking-wide mb-2" }, t.measureLabel),
-                  /* @__PURE__ */ React.createElement(MicMeasureButton, { accent: "#c9a15a", deviceId: micDeviceId, targetHz: isSnare ? top : top, minHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).min, maxHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).max, labels: { stop: t.micStop, measure: t.micMeasure, title: t.micMeasureTitle, noTone: t.micNoTone, tryLouder: t.micTryLouder, micGroupsLabel: t.micGroupsLabel, filter: t.micFilter, filterTitle: t.micFilterTitle, filterActive: t.micFilterActive, filterNoMatch: t.micFilterNoMatch } })
+                  /* @__PURE__ */ React.createElement(MicMeasureButton, { accent: "#c9a15a", deviceId: micDeviceId, targetTop: top, targetBottom: bottom, minHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).min, maxHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).max, labels: { stop: t.micStop, measure: t.micMeasure, title: t.micMeasureTitle, noTone: t.micNoTone, tryLouder: t.micTryLouder, micGroupsLabel: t.micGroupsLabel, filter: t.micFilter, filterTitle: t.micFilterTitle, filterActive: t.micFilterActive, filterNoMatch: t.micFilterNoMatch } })
                 )
               ),
               /* @__PURE__ */ React.createElement("div", { className: "flex flex-col items-center gap-2 justify-center" },
