@@ -80,7 +80,7 @@
     <p>Der <strong>Lug-Ring</strong> zeigt die Kreuz-Stimmreihenfolge: immer zum gegenüberliegenden Lug, dann eine weiter.</p>
     <p><strong>Ablauf:</strong> Trommel umdrehen — zu stimmendes Fell oben, das andere auf weicher Unterlage. Lugs in Kreuz-Reihenfolge anschlagen, Schrauben anpassen bis die Anzeige grün wird. Dann umdrehen und zweites Fell genauso.</p>
     <h3>Filter</h3>
-    <p>Ab ~300 Hz wird die Messung ungenauer. Lösung: erst korrekte Messung machen, dann <strong>Filter</strong> drücken. Ab dann kommen nur noch Frequenzen im Bereich ±1,5 Halbtöne infrage. Nochmal drücken schaltet aus. Bei Stimmungsänderungen neu setzen.</p>
+    <p>Ab ~300 Hz wird die Messung ungenauer. Lösung: erst korrekte Messung machen, dann <strong>Filter</strong> drücken. Ab dann kommen nur noch Frequenzen im Bereich ±2 Halbtöne infrage. Nochmal drücken schaltet aus. Bei Stimmungsänderungen neu setzen.</p>
     <h3>Kalibrieren</h3>
     <p><strong>Schritt 1:</strong> Beide Felle auf dieselbe Lug-Frequenz stimmen (Unisono).</p>
     <p><strong>Schritt 2:</strong> Trommel auf Ständer, mittig anschlagen → Grundton messen.</p>
@@ -444,7 +444,7 @@ function closeHelp() {
       );
       if (hasMode) score += 50;
 
-      // -45: Obermode dieses Kandidaten ist selbst Lug-Kandidat → Grundton-Verdacht
+      // -25: Obermode dieses Kandidaten ist selbst Lug-Kandidat → Grundton-Verdacht
       // Beim Lug-Anschlag nah am Rand ist der Lug-Ton lauter als der Grundton.
       // Wenn die Obermode eines Kandidaten ebenfalls im Lug-Pool liegt, ist dieser
       // Kandidat wahrscheinlich der Grundton, nicht der Lug-Ton.
@@ -452,7 +452,7 @@ function closeHelp() {
         lugCandidates.some(g => g.freq !== cand.freq &&
           Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= 80)
       );
-      if (oberModeIstLugKandidat) score -= 45;
+      if (oberModeIstLugKandidat) score -= 25;
 
       // +20: relative Lautstärke im 6-dB-Fenster (normiert 0–20)
       score += 20 * (cand.db - loudMaxDb + 6) / 6;
@@ -760,7 +760,7 @@ function closeHelp() {
                 ),
                 /* @__PURE__ */ React.createElement("div", { className: "pt-1" },
                   /* @__PURE__ */ React.createElement("p", { className: "text-[#a8977b] text-[10px] uppercase tracking-wide mb-2" }, t.measureLabel),
-                  /* @__PURE__ */ React.createElement(MicMeasureButton, { accent: "#c9a15a", deviceId: micDeviceId, minHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).min, maxHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).max, labels: { stop: t.micStop, measure: t.micMeasure, title: t.micMeasureTitle, noTone: t.micNoTone, tryLouder: t.micTryLouder, micGroupsLabel: t.micGroupsLabel, filter: t.micFilter, filterTitle: t.micFilterTitle, filterActive: t.micFilterActive, filterNoMatch: t.micFilterNoMatch } })
+                  /* @__PURE__ */ React.createElement(MicMeasureButton, { accent: "#c9a15a", deviceId: micDeviceId, targetHz: isSnare ? top : top, minHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).min, maxHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).max, labels: { stop: t.micStop, measure: t.micMeasure, title: t.micMeasureTitle, noTone: t.micNoTone, tryLouder: t.micTryLouder, micGroupsLabel: t.micGroupsLabel, filter: t.micFilter, filterTitle: t.micFilterTitle, filterActive: t.micFilterActive, filterNoMatch: t.micFilterNoMatch } })
                 )
               ),
               /* @__PURE__ */ React.createElement("div", { className: "flex flex-col items-center gap-2 justify-center" },
