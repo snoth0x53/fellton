@@ -415,7 +415,10 @@ function closeHelp() {
     return { groups };
   }
   const TOLERANCE_CENTS = 35; // ±35 Cents — enger als Viertelton, verhindert Körperschall-Bestätigung
-  const MODE_RATIOS_CENTS = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
+  // Nur die (1,1)-Mode (≈1,59×) wird zur Bestätigung genutzt. Die höheren Moden
+  // 2,14 / 2,30 / 2,65 liegen so eng beieinander, dass sie mit ±35 Cents ein
+  // durchgehendes Band bilden und in dichten Spektren zufällig treffen.
+  const MODE_RATIOS_CENTS = [1.59].map(r => 1200 * Math.log2(r));
   function pickStrongestGroup(groups, filterHz = null) {
     const candidates = filterHz == null ? groups : groups.filter((g) => g.freq >= filterHz / FILTER_BAND && g.freq <= filterHz * FILTER_BAND);
     if (candidates.length === 0) return null;
