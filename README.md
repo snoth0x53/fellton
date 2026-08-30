@@ -3,7 +3,7 @@
 Ein kleiner, eigenständiger Web-Rechner zum Stimmen von Schlagzeugfellen. Kein
 Build-Step, kein Backend – läuft komplett im Browser, auch offline.
 
-🔗 **Live:** https://snoh0x53.github.io/fellton/
+🔗 **Live:** https://snoth0x53.github.io/fellton/
 
 > **Lizenz:** MIT — kostenlos nutzbar und veränderbar, Namensnennung erforderlich.
 > Kommerzielle Nutzung bitte vorher anfragen.
