@@ -433,9 +433,13 @@ function closeHelp() {
       const confirmed = MODE_RATIOS_CENTS.some(tc =>
         sorted.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS)
       );
-      if (confirmed) return cand.freq;
+      if (confirmed && cand.freq <= 440) return cand.freq;
     }
-    return result.freq;
+    // Fallback: stärkste Gruppe unter 440 Hz
+    const below440 = candidates.filter(g => g.freq <= 440);
+    return below440.length > 0
+      ? below440.reduce((m, g) => g.db > m.db ? g : m).freq
+      : result.freq;
   }
   function hzToNote(hz) {
     const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
@@ -489,7 +493,7 @@ function closeHelp() {
         const loop = () => {
           fast.getFloatTimeDomainData(timeBuf);
           let rms = 0; for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i]; rms = Math.sqrt(rms / timeBuf.length);
-          if (armedRef.current && rms > 0.03) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshot, 80); }
+          if (armedRef.current && rms > 0.02) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshot, 80); }
           else if (!armedRef.current && !pendingRef.current && rms < 0.02) { armedRef.current = true; }
           rafRef.current = requestAnimationFrame(loop);
         };
