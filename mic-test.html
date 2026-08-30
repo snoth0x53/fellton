@@ -404,7 +404,7 @@
       peaks.length = 24;
       peaks.sort((a, b) => a.freq - b.freq);
     }
-    const groupGap = (f) => Math.max(8, f * 0.06);
+    const groupGap = (f) => Math.max(5, Math.min(14, f * 0.025));
     const subsets = [];
     let current = [peaks[0]];
     for (let k = 1; k < peaks.length; k++) {
