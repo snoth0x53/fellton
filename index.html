@@ -236,6 +236,7 @@ function closeHelp() {
       micFilterTitle: "Filter setzen: Der zuletzt gemessene Wert wird Referenz \u2014 danach werden nur noch Werte im Bereich von zwei Halbt\xF6nen darum ber\xFCcksichtigt. Nochmal klicken schaltet den Filter aus.",
       micFilterActive: "Filter:",
       micFilterNoMatch: "kein Wert im Filterband",
+      micTimeout: "Automatisch gestoppt (5 Min. Inaktivität) — erneut auf Messen drücken",
       micTestHint: "Zum Pr\xFCfen des Mikrofon-Setups gibt es ein separates Diagnose-Werkzeug:",
       micTestLink: "Mikrofon-Test",
       footer1: "Maximum Resonance = Grundton \xD7 1,75 (beide Felle); High = \xD71,5 / \xD71,85; Medium = \xD71,4 / \xD72,0; Low = \xD71,2 / \xD72,3.",
@@ -296,6 +297,7 @@ function closeHelp() {
       micGroupsLabel: "Groups:", micFilter: "Filter",
       micFilterTitle: "Set filter: the last measured value becomes the reference \u2014 from then on only values within two semitones are considered. Click again to switch the filter off.",
       micFilterActive: "Filter:", micFilterNoMatch: "no value inside filter band",
+      micTimeout: "Auto-stopped (5 min inactivity) — press Measure again",
       micTestHint: "There is a separate diagnostic tool for checking the microphone setup:",
       micTestLink: "Microphone test",
       footer1: "Maximum Resonance = fundamental \xD7 1.75 (both heads); High = \xD71.5 / \xD71.85; Medium = \xD71.4 / \xD72.0; Low = \xD71.2 / \xD72.3.",
@@ -489,7 +491,28 @@ function closeHelp() {
     const [errorMsg, setErrorMsg] = useState("");
     const [filterHz, setFilterHz] = useState(null);
     const stopFnRef = useRef(null), rafRef = useRef(null), armedRef = useRef(true), pendingRef = useRef(null), filterRef = useRef(null);
+    const inactivityRef = useRef(null), warningRef = useRef(null);
+    const [warning, setWarning] = useState(false);
+
+    const clearInactivityTimers = () => {
+      clearTimeout(inactivityRef.current);
+      clearTimeout(warningRef.current);
+      setWarning(false);
+    };
+    const resetInactivityTimer = () => {
+      clearInactivityTimers();
+      warningRef.current = setTimeout(() => setWarning(true), 4 * 60 * 1000);
+      inactivityRef.current = setTimeout(() => {
+        clearInactivityTimers();
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        if (pendingRef.current) { clearTimeout(pendingRef.current); pendingRef.current = null; }
+        if (stopFnRef.current) stopFnRef.current();
+        setStatus("timeout");
+      }, 5 * 60 * 1000);
+    };
+
     const stopListening = () => {
+      clearInactivityTimers();
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (pendingRef.current) { clearTimeout(pendingRef.current); pendingRef.current = null; }
       if (stopFnRef.current) stopFnRef.current();
@@ -501,7 +524,7 @@ function closeHelp() {
     };
     const handleClick = async () => {
       if (status === "listening") { stopListening(); return; }
-      setStatus("listening"); setResult(null); setErrorMsg(""); armedRef.current = true;
+      setStatus("listening"); setResult(null); setErrorMsg(""); armedRef.current = true; resetInactivityTimer();
       let stream;
       try { stream = await getMicStream(deviceId); }
       catch (e1) {
@@ -555,7 +578,7 @@ function closeHelp() {
         const loop = () => {
           fast.getFloatTimeDomainData(timeBuf);
           let rms = 0; for (let i = 0; i < timeBuf.length; i++) rms += timeBuf[i] * timeBuf[i]; rms = Math.sqrt(rms / timeBuf.length);
-          if (armedRef.current && rms > 0.02) { armedRef.current = false; pendingRef.current = setTimeout(takeSnapshots, 0); setTimeout(() => { armedRef.current = true; }, 600); }
+          if (armedRef.current && rms > 0.02) { armedRef.current = false; resetInactivityTimer(); pendingRef.current = setTimeout(takeSnapshots, 0); setTimeout(() => { armedRef.current = true; }, 600); }
           rafRef.current = requestAnimationFrame(loop);
         };
         loop();
@@ -574,11 +597,16 @@ function closeHelp() {
     const btnBase = "text-sm uppercase tracking-wide border-2 rounded-md h-11 px-5 transition-colors font-semibold flex items-center justify-center";
     const canFilter = filterHz != null || (result != null && result.value != null);
     const chosen = displayed;
+    // Button-Farbe: orange bei Warnung (4min), normal sonst
+    const btnListeningStyle = warning
+      ? { borderColor: "#c9855a", backgroundColor: "#c9855a", color: "#1a140d" }
+      : { borderColor: accent, backgroundColor: accent, color: "#1a140d" };
     return /* @__PURE__ */ React.createElement("div", { className: "no-print flex flex-col gap-2" },
       /* @__PURE__ */ React.createElement("div", { className: "flex items-center gap-3 flex-wrap" },
-        /* @__PURE__ */ React.createElement("button", { onClick: handleClick, title: status === "listening" ? labels.stop : labels.title, className: btnBase, style: status === "listening" ? { borderColor: accent, backgroundColor: accent, color: "#1a140d" } : { borderColor: accent, color: accent } }, status === "listening" ? `\u{1F3A4} ${labels.stop}` : `\u{1F3A4} ${labels.measure}`),
+        /* @__PURE__ */ React.createElement("button", { onClick: handleClick, title: status === "listening" ? labels.stop : labels.title, className: btnBase, style: status === "listening" ? btnListeningStyle : { borderColor: accent, color: accent } }, status === "listening" ? `\u{1F3A4} ${labels.stop}` : `\u{1F3A4} ${labels.measure}`),
         /* @__PURE__ */ React.createElement("button", { onClick: toggleFilter, disabled: !canFilter, title: labels.filterTitle, className: btnBase, style: filterHz != null ? { borderColor: accent, backgroundColor: accent, color: "#1a140d" } : { borderColor: canFilter ? accent : "#5c4a33", color: canFilter ? accent : "#5c4a33", cursor: canFilter ? "pointer" : "default" } }, labels.filter),
         displayed != null && (status === "listening" || status === "done") && /* @__PURE__ */ React.createElement("span", { className: resultClass + " text-lg", style: { fontFamily: "ui-monospace, monospace" } }, Math.round(displayed), " Hz (", hzToNote(displayed), ")", delta != null ? ` ${delta >= 0 ? "+" : ""}${Math.round(delta)} Hz` : "", status === "listening" ? "\u2026" : ""),
+        status === "timeout" && /* @__PURE__ */ React.createElement("span", { className: "text-[#a8977b] text-xs" }, labels.micTimeout || "Automatisch gestoppt"),
         noMatch && /* @__PURE__ */ React.createElement("span", { className: "text-[#c1666b] text-xs" }, labels.filterNoMatch),
         status === "error" && /* @__PURE__ */ React.createElement("span", { className: "text-[#c1666b] text-xs" }, labels.noTone, errorMsg ? ` (${errorMsg})` : ` \u2014 ${labels.tryLouder}`)
       ),
@@ -597,9 +625,9 @@ function closeHelp() {
   const RESONANCE_MODES = { maximum: { label: "Maximum (Unisono)", high: 1.75, low: 1.75 }, high: { label: "High", high: 1.85, low: 1.5 }, medium: { label: "Medium", high: 2, low: 1.4 }, low: { label: "Low", high: 2.3, low: 1.2 }, pro: { label: "Profi-Durchschnitt (empirisch)", high: null, low: null } };
   const PRO_AVERAGE = { "Bass Drum": { high: 1.82, low: 1.62 }, "Tom": { high: 1.92, low: 1.6 }, "Floor Tom": { high: 1.92, low: 1.6 } };
   const DRUM_PRESETS = [
-    { name: 'Bass Drum', type: "Bass Drum", diameter: 22, lugs: 10, note: "C", octave: 2 },
-    { name: 'Floor Tom', type: "Floor Tom", diameter: 16, lugs: 8, note: "E", octave: 2 },
-    { name: 'Rack Tom', type: "Tom", diameter: 14, lugs: 8, note: "G#", octave: 2 },
+    { name: '22" Bass Drum', type: "Bass Drum", diameter: 22, lugs: 10, note: "C", octave: 2 },
+    { name: '16" Floor Tom', type: "Floor Tom", diameter: 16, lugs: 8, note: "E", octave: 2 },
+    { name: '14" Rack Tom', type: "Tom", diameter: 14, lugs: 8, note: "G#", octave: 2 },
     { name: 'Ludwig Acrolite', type: "Snare", diameter: 14, lugs: 8, note: "F", octave: 3 }
   ];
   const SNARE_TOP_BASE = 1.4;
@@ -766,7 +794,7 @@ function closeHelp() {
                 ),
                 /* @__PURE__ */ React.createElement("div", { className: "pt-1" },
                   /* @__PURE__ */ React.createElement("p", { className: "text-[#a8977b] text-[10px] uppercase tracking-wide mb-2" }, t.measureLabel),
-                  /* @__PURE__ */ React.createElement(MicMeasureButton, { accent: "#c9a15a", deviceId: micDeviceId, targetTop: top, targetBottom: bottom, minHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).min, maxHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).max, labels: { stop: t.micStop, measure: t.micMeasure, title: t.micMeasureTitle, noTone: t.micNoTone, tryLouder: t.micTryLouder, micGroupsLabel: t.micGroupsLabel, filter: t.micFilter, filterTitle: t.micFilterTitle, filterActive: t.micFilterActive, filterNoMatch: t.micFilterNoMatch } })
+                  /* @__PURE__ */ React.createElement(MicMeasureButton, { accent: "#c9a15a", deviceId: micDeviceId, targetTop: top, targetBottom: bottom, minHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).min, maxHz: (MIC_RANGE[d.type] || MIC_RANGE["Tom"]).max, labels: { stop: t.micStop, measure: t.micMeasure, title: t.micMeasureTitle, noTone: t.micNoTone, tryLouder: t.micTryLouder, micGroupsLabel: t.micGroupsLabel, filter: t.micFilter, filterTitle: t.micFilterTitle, filterActive: t.micFilterActive, filterNoMatch: t.micFilterNoMatch, micTimeout: t.micTimeout } })
                 )
               ),
               /* @__PURE__ */ React.createElement("div", { className: "flex flex-col items-center gap-2 justify-center" },
