@@ -415,37 +415,52 @@ function closeHelp() {
     return { groups };
   }
   const TOLERANCE_CENTS = 50; // ±50 Cents — sicher mit 1,59-only (keine höheren Moden mehr)
-  // Nur die (1,1)-Mode (≈1,59×) wird zur Bestätigung genutzt. Die höheren Moden
-  // 2,14 / 2,30 / 2,65 liegen so eng beieinander, dass sie mit ±35 Cents ein
-  // durchgehendes Band bilden und in dichten Spektren zufällig treffen.
+  // Nur die (1,1)-Mode (≈1,59×) wird zur Bestätigung genutzt.
   const MODE_RATIOS_CENTS = [1.59].map(r => 1200 * Math.log2(r));
+
   function pickStrongestGroup(groups, filterHz = null) {
     const candidates = filterHz == null ? groups : groups.filter((g) => g.freq >= filterHz / FILTER_BAND && g.freq <= filterHz * FILTER_BAND);
     if (candidates.length === 0) return null;
     if (candidates.length === 1) return candidates[0].freq;
     const sorted = [...candidates].sort((a, b) => a.freq - b.freq);
-    // Gruppen über 440 Hz aus der Kandidatenliste für den Lug-Ton entfernen
-    // Sie können aber noch zur Moden-Bestätigung genutzt werden
+
+    // Lug-Kandidaten: ≤440 Hz — Obermoden dürfen zur Bestätigung genutzt werden
     const lugCandidates = sorted.filter(g => g.freq <= 440);
-    const result = lugCandidates.length > 0
-      ? lugCandidates.reduce((m, g) => g.db > m.db ? g : m)
-      : sorted.reduce((m, g) => g.db > m.db ? g : m);
-    // Lautstärke-Vorfilter: nur Gruppen innerhalb 10 dB des stärksten Lug-Kandidaten
-    const loudMaxDb = lugCandidates.length > 0
-      ? Math.max(...lugCandidates.map(g => g.db))
-      : Math.max(...candidates.map(g => g.db));
-    const loud = (lugCandidates.length > 0 ? lugCandidates : sorted)
-      .filter(g => g.db >= loudMaxDb - 6);
-    const confirmedCandidates = [];
-    for (const cand of loud) {
-      const confirmed = MODE_RATIOS_CENTS.some(tc =>
+    if (lugCandidates.length === 0) return sorted.reduce((m, g) => g.db > m.db ? g : m).freq;
+
+    // 6-dB-Vorfilter NUR innerhalb der Lug-Kandidaten
+    const loudMaxDb = Math.max(...lugCandidates.map(g => g.db));
+    const loud = lugCandidates.filter(g => g.db >= loudMaxDb - 6);
+
+    // Score pro Kandidat
+    const lowestFreq = Math.min(...loud.map(g => g.freq));
+    const scored = loud.map(cand => {
+      let score = 0;
+
+      // +40: Moden-Bestätigung (Obermode vorhanden, auch >440 Hz erlaubt)
+      const hasMode = MODE_RATIOS_CENTS.some(tc =>
         sorted.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS)
       );
-      if (confirmed) confirmedCandidates.push(cand);
-    }
-    if (confirmedCandidates.length > 0)
-      return confirmedCandidates.reduce((m, g) => g.db > m.db ? g : m).freq;
-    return result.freq;
+      if (hasMode) score += 40;
+
+      // +30: relative Lautstärke (normiert 0–30)
+      score += 30 * (cand.db - loudMaxDb + 6) / 6;
+
+      // +20: Nähe zur Filterreferenz wenn Filter aktiv
+      if (filterHz != null) {
+        const centsDist = Math.abs(1200 * Math.log2(cand.freq / filterHz));
+        score += Math.max(0, 20 * (1 - centsDist / (FILTER_SEMITONES * 100)));
+      }
+
+      // +10: tiefste bestätigte Gruppe bevorzugen (Grundmode)
+      if (hasMode && cand.freq === lowestFreq) score += 10;
+
+      return { cand, score };
+    });
+
+    // Höchsten Score gewinnt
+    const best = scored.reduce((m, s) => s.score > m.score ? s : m);
+    return best.cand.freq;
   }
   function hzToNote(hz) {
     const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
