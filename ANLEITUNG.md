@@ -97,8 +97,7 @@ sich die Spannung gleichmäßig.
 3. Schrauben anpassen bis der angezeigte Wert dem Zielwert entspricht (grün = nah dran).
 4. Trommel umdrehen und das zweite Fell genauso stimmen.
 
-**Tipp:** Zwischen den Anschlägen ca. 1 Sekunde warten — das lässt das Fell
-vollständig ausklingen und verbessert die Stabilität der Messung.
+**Tipp:** Zwischen den Anschlägen den Ton vollständig ausklingen lassen bevor der nächste Schlag gemacht wird — bei tief gestimmten Fellen kann das länger dauern. Erst wenn das Fell still ist, ist das Signal sauber für die nächste Messung.
 
 **Wichtig beim Stimmen:**
 - Immer nach oben stimmen, nie nach unten. Ist ein Lug zu hoch gestimmt, erst weiter

@@ -63,8 +63,9 @@ Der Kandidat der in den meisten dieser Zeitfenster auftaucht gewinnt — zufäll
 Störpeaks die nur kurz erscheinen fallen heraus. Das macht die Erkennung robuster
 als ein einzelner Snapshot.
 
-Zwischen den Anschlägen ca. 1 Sekunde warten gibt dem Tool Zeit für einen vollständigen
-Messzyklus und verbessert die Stabilität.
+Zwischen den Anschlägen den Ton vollständig ausklingen lassen bevor der nächste
+Schlag gemacht wird — bei tief gestimmten Fellen kann das länger dauern. Erst wenn
+das Fell still ist, ist das Signal sauber für die nächste Messung.
 
 ---
 
