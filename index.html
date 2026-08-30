@@ -435,7 +435,7 @@ function closeHelp() {
       ? Math.max(...lugCandidates.map(g => g.db))
       : Math.max(...candidates.map(g => g.db));
     const loud = (lugCandidates.length > 0 ? lugCandidates : sorted)
-      .filter(g => g.db >= loudMaxDb - 10);
+      .filter(g => g.db >= loudMaxDb - 6);
     const confirmedCandidates = [];
     for (const cand of loud) {
       const confirmed = MODE_RATIOS_CENTS.some(tc =>
@@ -452,7 +452,7 @@ function closeHelp() {
     const midi = Math.round(12 * Math.log2(hz / 440) + 69);
     return names[((midi % 12) + 12) % 12];
   }
-  const MIC_RANGE = { "Bass Drum": { min: 30, max: 160 }, "Tom": { min: 50, max: 350 }, "Floor Tom": { min: 50, max: 350 }, "Snare": { min: 150, max: 600 } };
+  const MIC_RANGE = { "Bass Drum": { min: 30, max: 160 }, "Tom": { min: 50, max: 350 }, "Floor Tom": { min: 50, max: 350 }, "Snare": { min: 90, max: 600 } };
   function getMicStream(deviceId) {
     return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, deviceId: deviceId ? { exact: deviceId } : void 0 } });
   }

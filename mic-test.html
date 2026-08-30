@@ -729,7 +729,7 @@
         ? Math.max(...lugCandidatesLive.map(g => g.db))
         : Math.max(...groups.map(g => g.db));
       const loudLive = (lugCandidatesLive.length > 0 ? lugCandidatesLive : sortedLive)
-        .filter(g => g.db >= loudMaxDbLive - 10);
+        .filter(g => g.db >= loudMaxDbLive - 6);
       const confirmedLive = [];
       for (const cand of loudLive) {
         const confirmed = MODE_RATIOS_CENTS_LIVE.some(tc =>
@@ -747,32 +747,37 @@
     // Onset — abgesenkte Schwellen für schwächere Mikrofone
     if (!onsetActive && rmsLive > 0.001) {
       onsetActive = true;
-      setTimeout(() => {
+      // Mehrfach-Snapshot: 4 Fenster bei 60/90/120/150ms
+      // Kandidat der in den meisten Fenstern auftaucht gewinnt
+      const SNAP_OFFSETS = [60, 90, 120, 150];
+      const snapResults = [];
+      let snapsDone = 0;
+
+      const processSnaps = () => {
         if (!analyser) return;
-        const t2 = new Float32Array(analyser.fftSize);
-        analyser.getFloatTimeDomainData(t2);
-        const d2 = new Float32Array(analyser.frequencyBinCount);
-        analyser.getFloatFrequencyData(d2);
-        const snap    = analyzeSpectrum(d2, audioCtx.sampleRate, analyser.fftSize);
-        const yinSnap = detectPitch(t2, audioCtx.sampleRate);
-        const snapRMS = calcRMS(t2);
-        // Snapshot nur loggen wenn Pegel beim Anschlag hoch genug — filtert
-        // Raumresonanzen und Körperschall bei zu schwachem Signal raus
-        if (snapRMS < 0.02) return;
-        if (snap && snap.groups.length) {
-          // Identische Logik wie Live-Anzeige: tiefste moden-bestätigte Gruppe
-          const TOLERANCE_CENTS_SNAP = 50;
-          const MODE_RATIOS_CENTS_SNAP = [1.59].map(r => 1200 * Math.log2(r));
-          const sortedSnap = [...snap.groups].sort((a, b) => a.freq - b.freq);
+        if (snapResults.length < SNAP_OFFSETS.length) return;
+
+        // Nur Snapshots mit ausreichendem Pegel
+        const validSnaps = snapResults.filter(s => s.rms >= 0.02);
+        if (validSnaps.length === 0) return;
+
+        const TOLERANCE_CENTS_SNAP = 50;
+        const MODE_RATIOS_CENTS_SNAP = [1.59].map(r => 1200 * Math.log2(r));
+
+        // Kandidaten aus allen validen Snapshots sammeln
+        const candidateFreqs = {};
+        let bestGroups = null, bestRMS = 0, bestD2 = null, bestT2 = null;
+
+        for (const s of validSnaps) {
+          if (s.rms > bestRMS) { bestRMS = s.rms; bestGroups = s.groups; bestD2 = s.d2; bestT2 = s.t2; }
+          if (!s.groups) continue;
+          const sortedSnap = [...s.groups].sort((a, b) => a.freq - b.freq);
           const lugCandidatesSnap = sortedSnap.filter(g => g.freq <= 440);
-          let snapMain = lugCandidatesSnap.length > 0
-            ? lugCandidatesSnap.reduce((m, g) => g.db > m.db ? g : m)
-            : snap.groups.reduce((m, g) => g.db > m.db ? g : m);
           const loudMaxDbSnap = lugCandidatesSnap.length > 0
             ? Math.max(...lugCandidatesSnap.map(g => g.db))
-            : Math.max(...snap.groups.map(g => g.db));
+            : Math.max(...s.groups.map(g => g.db));
           const loudSnap = (lugCandidatesSnap.length > 0 ? lugCandidatesSnap : sortedSnap)
-            .filter(g => g.db >= loudMaxDbSnap - 10);
+            .filter(g => g.db >= loudMaxDbSnap - 6);
           const confirmedSnap = [];
           for (const cand of loudSnap) {
             const confirmed = MODE_RATIOS_CENTS_SNAP.some(tc =>
@@ -780,28 +785,68 @@
             );
             if (confirmed) confirmedSnap.push(cand);
           }
-          if (confirmedSnap.length > 0)
-            snapMain = confirmedSnap.reduce((m, g) => g.db > m.db ? g : m);
-          const gs = [...snap.groups].sort((a, b) => a.freq - b.freq);
-          history.push(gs.map(g => g.freq));
-          if (history.length > HISTORY_SIZE) history.shift();
-          const stableHz = pickStablePeak(history);
-          stableDisplay.textContent = stableHz != null
-            ? stableHz.toFixed(1) + ' Hz (' + hzToNote(stableHz) + ')'
-            : '—';
-          const score = computeSoundScore(t2, d2, audioCtx.sampleRate, analyser.fftSize);
-          renderScore(score);
-          hits.push({
-            time:   new Date().toLocaleTimeString(TT[lang].locale),
-            groups: gs.map(g => g.freq.toFixed(0)).join(' · '),
-            groupsDb: gs.map(g => g.freq.toFixed(0) + '@' + g.db.toFixed(1)).join(' · '),
-            yin:    yinSnap.freq,
-            rms:    snapRMS,
-            score:  score ? score.total : null,
-          });
-          renderHitLog();
+          const winner = confirmedSnap.length > 0
+            ? confirmedSnap.reduce((m, g) => g.db > m.db ? g : m)
+            : (lugCandidatesSnap.length > 0 ? lugCandidatesSnap.reduce((m, g) => g.db > m.db ? g : m) : null);
+          if (!winner) continue;
+          // Frequenz auf 10-Hz-Raster runden für Stabilitätsvergleich
+          const bucket = Math.round(winner.freq / 10) * 10;
+          if (!candidateFreqs[bucket]) candidateFreqs[bucket] = { count: 0, freqs: [], db: [] };
+          candidateFreqs[bucket].count++;
+          candidateFreqs[bucket].freqs.push(winner.freq);
+          candidateFreqs[bucket].db.push(winner.db);
         }
-      }, 80);
+
+        // Stabilsten Kandidaten wählen (häufigster, bei Gleichstand lautester)
+        let snapMain = null;
+        let bestScore = -1;
+        for (const [bucket, data] of Object.entries(candidateFreqs)) {
+          const avgDb = data.db.reduce((a, b) => a + b, 0) / data.db.length;
+          const score = data.count * 100 + avgDb;
+          if (score > bestScore) {
+            bestScore = score;
+            snapMain = { freq: data.freqs.reduce((a, b) => a + b, 0) / data.freqs.length, db: avgDb };
+          }
+        }
+
+        if (!snapMain || !bestGroups) return;
+
+        const yinSnap = detectPitch(bestT2, audioCtx.sampleRate);
+        const gs = [...bestGroups].sort((a, b) => a.freq - b.freq);
+        history.push(gs.map(g => g.freq));
+        if (history.length > HISTORY_SIZE) history.shift();
+        const stableHz = pickStablePeak(history);
+        stableDisplay.textContent = stableHz != null
+          ? stableHz.toFixed(1) + ' Hz (' + hzToNote(stableHz) + ')'
+          : '—';
+        const score = computeSoundScore(bestT2, bestD2, audioCtx.sampleRate, analyser.fftSize);
+        renderScore(score);
+        hits.push({
+          time:     new Date().toLocaleTimeString(TT[lang].locale),
+          groups:   gs.map(g => g.freq.toFixed(0)).join(' · '),
+          groupsDb: gs.map(g => g.freq.toFixed(0) + '@' + g.db.toFixed(1)).join(' · '),
+          yin:      yinSnap.freq,
+          rms:      bestRMS,
+          score:    score ? score.total : null,
+        });
+        renderHitLog();
+      };
+
+      for (const offset of SNAP_OFFSETS) {
+        setTimeout(() => {
+          if (!analyser) { snapResults.push({ rms: 0, groups: null, d2: null, t2: null }); snapsDone++; if (snapsDone === SNAP_OFFSETS.length) processSnaps(); return; }
+          const t2 = new Float32Array(analyser.fftSize);
+          analyser.getFloatTimeDomainData(t2);
+          const d2 = new Float32Array(analyser.frequencyBinCount);
+          analyser.getFloatFrequencyData(d2);
+          const snap = analyzeSpectrum(d2, audioCtx.sampleRate, analyser.fftSize);
+          const rms = calcRMS(t2);
+          snapResults.push({ rms, groups: snap ? snap.groups : null, d2, t2 });
+          snapsDone++;
+          if (snapsDone === SNAP_OFFSETS.length) processSnaps();
+        }, offset);
+      }
+
       setTimeout(() => { onsetActive = false; }, 500);
     }
 
