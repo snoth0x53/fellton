@@ -155,7 +155,7 @@ Für crowd-sourced Vergleiche lassen sich **Trommel-Metadaten** (Modell, Fell-Ty
 Bewertung 1–5, Notizen) eintragen und alle Anschläge als **CSV exportieren** —
 inklusive dB-Werten pro Gruppe für detaillierte Analyse.
 
-🔗 **Live:** https://snoh0x53.github.io/fellton/mic-test.html
+🔗 **Live:** https://snoth0x53.github.io/fellton/mic-test.html
 
 **Wichtig:** Mikrofonzugriff funktioniert nur in einem echten Browser-Tab über
 HTTPS (oder `localhost`) – nicht in eingebetteten Vorschau-Fenstern. Für lokale

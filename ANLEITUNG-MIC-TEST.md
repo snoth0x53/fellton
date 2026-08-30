@@ -3,7 +3,7 @@
 Das Mikrofon-Test-Tool ist ein eigenständiges Diagnose-Werkzeug, mit dem man ein
 Mikrofon-Setup prüfen kann, bevor es im Fellton-Rechner zum Einsatz kommt.
 
-🔗 https://snoh0x53.github.io/fellton/mic-test.html
+🔗 https://snoth0x53.github.io/fellton/mic-test.html
 
 **Wichtig:** Das Tool benötigt HTTPS. Die Live-Version funktioniert direkt im Browser.
 Für lokale Tests: `python3 -m http.server 8000` im Projektordner, dann

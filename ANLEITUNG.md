@@ -3,7 +3,7 @@
 Fellton ist ein kostenloser Web-Rechner zum Stimmen von Schlagzeugfellen. Er läuft
 direkt im Browser, benötigt keine Installation und funktioniert auch offline.
 
-🔗 https://snoh0x53.github.io/fellton/
+🔗 https://snoth0x53.github.io/fellton/
 
 ---
 
@@ -221,7 +221,7 @@ misst den Grundton, nicht die Lug-Frequenz.
 Auf dem Mac: Systemeinstellungen → Datenschutz & Sicherheit → Mikrofon prüfen ob der
 Browser dort aktiviert ist. Zusätzlich in Safari: Einstellungen → Websites →
 Mikrofon → die Seite explizit auf „Erlauben" setzen. Fellton benötigt HTTPS. Die
-Live-Version unter snoh0x53.github.io/fellton funktioniert direkt. Für lokale Tests:
+Live-Version unter snoth0x53.github.io/fellton funktioniert direkt. Für lokale Tests:
 `python3 -m http.server 8000` im Projektordner, dann http://localhost:8000 öffnen.
 
 **Der Messen-Button reagiert nicht.**
