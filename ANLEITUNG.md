@@ -28,7 +28,7 @@ auf der PDF und hilft, mehrere Stimmungen auseinanderzuhalten.
 Jede Trommel hat folgende Einstellungen:
 
 **Typ** — Bass Drum, Tom, Floor Tom oder Snare. Der Typ bestimmt den zulässigen
-Frequenzbereich für die Mikrofon-Messung: Snare 150–600 Hz, Tom/Floor Tom 50–350 Hz,
+Frequenzbereich für die Mikrofon-Messung: Snare 90–600 Hz, Tom/Floor Tom 50–350 Hz,
 Bassdrum 30–160 Hz. Frequenzen außerhalb werden ignoriert.
 
 **Durchmesser** — in Zoll, z. B. 14 für eine 14"-Snare. Wird zur Dokumentation
@@ -97,21 +97,23 @@ sich die Spannung gleichmäßig.
 3. Schrauben anpassen bis der angezeigte Wert dem Zielwert entspricht (grün = nah dran).
 4. Trommel umdrehen und das zweite Fell genauso stimmen.
 
+**Tipp:** Zwischen den Anschlägen ca. 1 Sekunde warten — das lässt das Fell
+vollständig ausklingen und verbessert die Stabilität der Messung.
+
+**Wichtig beim Stimmen:**
+- Immer nach oben stimmen, nie nach unten. Ist ein Lug zu hoch gestimmt, erst weiter
+  runter als das Ziel drehen und dann wieder hocharbeiten — so verhindert man, dass
+  die Fellspannung ungleichmäßig bleibt.
+- Beide Felle verstimmen sich mit der Zeit, nicht nur das Schlagfell. Das Resonanzfell
+  regelmäßig mitprüfen.
+
 ---
 
 ## Filter für den Hochtonbereich
 
-Ab etwa 300 Hz wird die Messung ungenauer, weil die Fell-Partialtöne enger
-zusammenrücken. Dafür gibt es den **Filter**:
-
-1. Erst eine korrekte Messung machen.
-2. **Filter**-Button drücken — der zuletzt gemessene Wert wird zur Referenz.
-3. Ab dann werden nur noch Frequenzen im Bereich von ±2 Halbtönen um diesen Wert
-   berücksichtigt. Oktavfehler und Störpeaks fallen heraus.
-
-Filter wieder ausschalten: nochmal auf **Filter** drücken. Bei größeren
-Stimmungsänderungen neu setzen. Beim Fellwechsel, wenn man von unten hocharbeitet,
-lässt man ihn am besten aus.
+Ab etwa 300 Hz wird die Messung ungenauer. Lösung: erst korrekte Messung machen, dann
+**Filter** drücken. Ab dann kommen nur noch Frequenzen im Bereich ±2 Halbtöne
+infrage. Nochmal drücken schaltet aus. Bei Stimmungsänderungen neu setzen.
 
 ---
 
@@ -122,7 +124,7 @@ Koeffizienten für genau diese Trommel und dieses Fell.
 
 **Schritt 1:** Beide Felle auf exakt dieselbe Lug-Frequenz stimmen (Unisono).
 
-**Schritt 2:** Trommel auf einen Ständer stellen (beide Felle frei, nichts gedämpft),
+**Schritt 2:** Trommel auf Ständer stellen (beide Felle frei, nichts gedämpft),
 mittig anschlagen und den Grundton messen. Der abgelesene Wert ist die reale
 Fundamentalfrequenz.
 
@@ -202,6 +204,11 @@ Einmal kalibrieren, dann stimmt die Berechnung für genau diese Trommel.
 
 ## Häufige Fragen
 
+**Die Messung zeigt falsche Werte (zu tief, z. B. 100 Hz statt 300 Hz).**
+Nah am Lug anschlagen (2–3 cm vom Rand), Snare-Teppich aushängen, und mindestens
+1 Sekunde zwischen den Anschlägen warten. Danach den Filter auf einen korrekten
+Messwert setzen — dann werden Ausreißer gefiltert.
+
 **Die Messung springt zwischen verschiedenen Werten hin und her.**
 Den Filter setzen — er begrenzt die Erkennung auf einen engen Frequenzbereich und
 filtert Ausreißer heraus.
@@ -210,10 +217,16 @@ filtert Ausreißer heraus.
 Sicherstellen dass nah am Lug angeschlagen wird (2–3 cm vom Rand). Mittig anschlagen
 misst den Grundton, nicht die Lug-Frequenz.
 
-**Die App fragt nicht nach Mikrofon-Erlaubnis.**
-Fellton benötigt HTTPS. Die Live-Version unter snoh0x53.github.io/fellton funktioniert
-direkt. Für lokale Tests: `python3 -m http.server 8000` im Projektordner, dann
-http://localhost:8000 öffnen.
+**Die App fragt nicht nach Mikrofon-Erlaubnis / „Geräte laden" reagiert nicht.**
+Auf dem Mac: Systemeinstellungen → Datenschutz & Sicherheit → Mikrofon prüfen ob der
+Browser dort aktiviert ist. Zusätzlich in Safari: Einstellungen → Websites →
+Mikrofon → die Seite explizit auf „Erlauben" setzen. Fellton benötigt HTTPS. Die
+Live-Version unter snoh0x53.github.io/fellton funktioniert direkt. Für lokale Tests:
+`python3 -m http.server 8000` im Projektordner, dann http://localhost:8000 öffnen.
 
 **Der Messen-Button reagiert nicht.**
 Browser-Tab neu laden und erneut auf „Geräte laden" klicken.
+
+---
+
+Das separate **[Mikrofon-Test-Tool](ANLEITUNG-MIC-TEST.md)** hat eine eigene Anleitung.

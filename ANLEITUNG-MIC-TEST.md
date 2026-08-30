@@ -21,6 +21,7 @@ zuverlässige Werte liefert. Das Test-Tool zeigt:
 - Ob das Mikrofon die relevanten Frequenzen korrekt erfasst
 - Einen **Sound Score** der die Signalqualität bewertet
 - Einen Log der letzten Anschläge zum direkten Vergleich
+- **dB-Werte pro Frequenzgruppe** für detaillierte Analyse
 
 ---
 
@@ -50,7 +51,20 @@ nur zum Vergleich. Bei Perkussion oft unzuverlässig, daher nur als Referenz.
 z. B. `200 · 315 · 419 Hz`. Die fett markierte Gruppe ist die ausgewählte.
 
 **Pegel (RMS)** — der Balken und der Prozentwert darunter zeigen wie laut das Signal
-ist. Ein zu niedriger Pegel kann die Erkennung beeinträchtigen.
+ist. Zu schwache Anschläge (unter ~2% RMS) werden automatisch verworfen — kräftiger
+anschlagen oder das Mikrofon näher ans Fell halten.
+
+---
+
+## Mehrfach-Snapshot für stabilere Erkennung
+
+Das Tool zieht nach jedem Anschlag vier FFT-Snapshots (bei 60, 90, 120 und 150 ms).
+Der Kandidat der in den meisten dieser Zeitfenster auftaucht gewinnt — zufällige
+Störpeaks die nur kurz erscheinen fallen heraus. Das macht die Erkennung robuster
+als ein einzelner Snapshot.
+
+Zwischen den Anschlägen ca. 1 Sekunde warten gibt dem Tool Zeit für einen vollständigen
+Messzyklus und verbessert die Stabilität.
 
 ---
 
@@ -65,8 +79,7 @@ Der Sound Score (0–100) bewertet die Qualität des Signals anhand von fünf Fa
 - **Dynamikumfang:** Wie groß ist der Abstand zwischen lautestem Peak und Grundrauschen?
 
 Der Score ist pegelunabhängig normalisiert — zwei Mikrofone mit unterschiedlichem
-Pegel können verglichen werden. Ein hoher Wert bedeutet ein sauberes, klar
-definiertes Signal.
+Pegel können verglichen werden.
 
 ---
 
@@ -85,11 +98,11 @@ zeigen die erkannten Gruppen: grün = stärkste/ausgewählte Gruppe, rot = weite
 Die Tabelle unten zeigt die letzten 10 Anschläge mit:
 - Uhrzeit
 - Erkannte Gruppen (Hz)
+- **dB-Wert pro Gruppe** (z. B. `316@-65.2 · 529@-58.4`) — zeigt wie laut jede
+  Gruppe war und hilft bei der Diagnose von Fehlmessungen
 - YIN-Wert (Vergleich)
 - Pegel (%)
 - Sound Score
-
-So lässt sich auf einen Blick prüfen ob die Erkennung über mehrere Anschläge stabil ist.
 
 ---
 
@@ -102,17 +115,14 @@ Vor der Messung können oben **Metadaten** eingetragen werden:
 - **Notizen** — z. B. „Stimmung nach Konzert, Snare-Seite locker"
 
 Mit **„CSV exportieren"** werden alle Anschläge des Logs zusammen mit den Metadaten
-als CSV-Datei gespeichert. Der Dateiname enthält automatisch das Datum.
-
-Das ist nützlich um verschiedene Mikrofone oder Fell-Typen miteinander zu vergleichen.
+und dB-Werten als CSV-Datei gespeichert. Der Dateiname enthält automatisch das Datum.
 
 ---
 
 ## Einfrieren und Log leeren
 
 **„Einfrieren"** hält die Live-Anzeige an — nützlich um einen Wert in Ruhe ablesen
-zu können, ohne dass neue Anschläge ihn überschreiben. **„Weiter"** setzt die
-Messung fort.
+zu können. **„Weiter"** setzt die Messung fort.
 
 **„Log leeren"** löscht alle bisherigen Einträge und setzt den stabilen Wert zurück.
 
@@ -125,25 +135,30 @@ Das Tool eignet sich gut um verschiedene Mikrofone zu vergleichen:
 1. Erstes Mikrofon auswählen, mehrere Anschläge am selben Lug machen, CSV exportieren.
 2. Stoppen, zweites Mikrofon auswählen, Log leeren, wieder messen, CSV exportieren.
 3. Die beiden CSV-Dateien vergleichen: Sind die erkannten Frequenzen gleich? Ist der
-   Pegel ähnlich? Ist der Sound Score vergleichbar?
+   Pegel ähnlich? Ist der Sound Score vergleichbar? Wie sind die dB-Verhältnisse
+   zwischen Lug-Ton und Obermoden?
 
 ---
 
 ## Tipps
 
-**Pegel zu niedrig:**
-Mikrofon näher ans Fell halten. Beim Smartphone hilft es, das Gerät direkt an die
-Anschlagsstelle zu halten — je näher, desto stabiler die Erkennung.
+**Pegel zu niedrig / Anschläge werden nicht erkannt:**
+Mikrofon näher ans Fell halten. Beim Smartphone direkt an die Anschlagsstelle halten.
+Kräftiger anschlagen — zu schwache Anschläge werden automatisch verworfen.
 
 **Viele verschiedene Gruppen im Spektrum:**
-Das ist normal — ein Fell schwingt in mehreren Moden gleichzeitig. Der Algorithmus
-wählt automatisch die tiefste bestätigte Grundmode aus. Wenn der angezeigte Wert
-trotzdem schwankt, ein externes Mikrofon direkt am Fell verwenden.
+Das ist normal — ein Fell schwingt in mehreren Moden gleichzeitig. Wenn der angezeigte
+Wert trotzdem schwankt, zwischen den Anschlägen länger warten und ein externes
+Mikrofon direkt am Fell verwenden.
 
 **Snare:**
-Teppich aushängen. Das Rasseln erzeugt viele Störfrequenzen und macht die Erkennung
-deutlich unzuverlässiger.
+Teppich aushängen. Das Rasseln erzeugt viele Störfrequenzen.
 
 **Erster Anschlag nach dem Start:**
-Der allererste Anschlag nach dem Starten kann manchmal unzuverlässig sein, weil das
-Mikrofon noch einpegelt. Einfach ignorieren und ab dem zweiten Anschlag messen.
+Der allererste Anschlag nach dem Starten kann manchmal unzuverlässig sein. Einfach
+ignorieren und ab dem zweiten Anschlag messen.
+
+**dB-Werte im CSV nutzen:**
+Wenn ein Wert falsch erscheint, zeigen die dB-Werte welche Gruppe dominiert hat.
+Ist eine unerwünschte Gruppe deutlich lauter als der echte Lug-Ton, hilft ein
+externes Mikrofon direkt am Fell — das verbessert das Signal-Rausch-Verhältnis.

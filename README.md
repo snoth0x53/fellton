@@ -3,7 +3,12 @@
 Ein kleiner, eigenständiger Web-Rechner zum Stimmen von Schlagzeugfellen. Kein
 Build-Step, kein Backend – läuft komplett im Browser, auch offline.
 
-🔗 **Live:** https://snoth0x53.github.io/fellton/
+🔗 **Live:** https://snoh0x53.github.io/fellton/
+
+> **Lizenz:** MIT — kostenlos nutzbar und veränderbar, Namensnennung erforderlich.
+> Kommerzielle Nutzung bitte vorher anfragen.
+
+📖 **[Benutzeranleitung](ANLEITUNG.md)**
 
 ## Was das Tool macht
 
@@ -36,11 +41,12 @@ bestimmt, was gemessen wird:
   So bringst du alle Lugs nacheinander auf denselben Wert.
 - **Mittig anschlagen** → der Grundton der ganzen Trommel.
 
-Jeder Anschlag wird für sich ausgewertet und die kräftigste Frequenzgruppe angezeigt –
-ohne Verrechnung über mehrere Schläge, damit ein einzelner Fehlgriff sich nicht auf
-die folgenden Messungen überträgt. Die Messung läuft, bis du sie manuell stoppst.
-Die Snare am besten mit ausgehängtem Teppich messen, damit das Rasseln nicht ins
-Signal kommt.
+Jeder Anschlag wird für sich ausgewertet und die wahrscheinlichste Lug-Frequenz
+angezeigt. Die Messung läuft, bis du sie manuell stoppst. Die Snare am besten mit
+ausgehängtem Teppich messen, damit das Rasseln nicht ins Signal kommt.
+
+Zwischen den Anschlägen kurz warten (ca. 1 Sekunde) gibt der Erkennung Zeit, das
+Fell vollständig ausklingen zu lassen – das verbessert die Stabilität der Messung.
 
 ### Filter für den Hochtonbereich
 
@@ -56,8 +62,7 @@ Dieser Wert wird zur Referenz, und ab dann kommen nur noch Frequenzen im Umkreis
 333 Hz – benachbarte Partialtöne, Oktavfehler und tiefe Störpeaks fallen heraus.
 
 Das Band ist bewusst musikalisch definiert statt prozentual: Ein fester Prozentwert
-wirkt im Bass eng und im Hochtonbereich viel zu weit (±20 % sind bei 300 Hz bereits
-±60 Hz, dort passen mühelos mehrere Partiale hinein). Eine Halbton-Angabe bleibt über
+wirkt im Bass eng und im Hochtonbereich viel zu weit. Eine Halbton-Angabe bleibt über
 den ganzen Bereich gleich streng.
 
 Bei größeren Stimmänderungen einfach neu setzen; für jede Trommel gilt der Filter
@@ -147,9 +152,10 @@ Tiefton-Energie, Harmonizität, Ring-Chaos, Dynamikumfang). Es nutzt dieselbe
 Spektralanalyse wie der Rechner; der YIN-Grundton wird als Referenz mit angezeigt.
 
 Für crowd-sourced Vergleiche lassen sich **Trommel-Metadaten** (Modell, Fell-Typ,
-Bewertung 1–5, Notizen) eintragen und alle Anschläge als **CSV exportieren**.
+Bewertung 1–5, Notizen) eintragen und alle Anschläge als **CSV exportieren** —
+inklusive dB-Werten pro Gruppe für detaillierte Analyse.
 
-🔗 **Live:** https://snoth0x53.github.io/fellton/mic-test.html
+🔗 **Live:** https://snoh0x53.github.io/fellton/mic-test.html
 
 **Wichtig:** Mikrofonzugriff funktioniert nur in einem echten Browser-Tab über
 HTTPS (oder `localhost`) – nicht in eingebetteten Vorschau-Fenstern. Für lokale
@@ -159,36 +165,40 @@ Tests: `python3 -m http.server 8000` im Projektordner, dann
 ## Genauigkeit der Mikrofon-Messung
 
 Nach jedem Anschlag wird das Frequenzspektrum per FFT analysiert (Fenstergröße 32768):
-Alle Peaks über einer Schwelle (18 dB unter dem stärksten) werden ermittelt und nach
-spektraler Nähe gruppiert. Der Gruppierungsabstand skaliert mit der Frequenz (6 %,
-mindestens 8 Hz), weil die Partialtöne nach oben hin enger zusammenrücken. Angezeigt
-wird die kräftigste Gruppe des jeweiligen Anschlags. Parabel-Interpolation verfeinert
-die Auflösung auf unter 1 Hz.
+Alle Peaks über einer Schwelle (18 dB unter dem stärksten) werden ermittelt, die 24
+lautesten behalten und nach spektraler Nähe gruppiert. Der Gruppierungsabstand skaliert
+mit der Frequenz (6 %, mindestens 8 Hz). Parabel-Interpolation verfeinert die
+Auflösung auf unter 1 Hz.
 
-### Fundamentalton-Erkennung via Membranmoden
+### Score-basierte Lug-Ton-Erkennung
 
-Ein Fell schwingt in mehreren überlagerten Moden gleichzeitig. Die höheren Moden
-können im Spektrum lauter erscheinen als der eigentliche Grundton – besonders bei
-Snares, wo die zweite Mode oft dominiert. Ein einfaches „stärkste Gruppe nehmen"
-liefert dann den falschen Wert.
+Ein Fell schwingt in mehreren überlagerten Moden gleichzeitig, und die Obermoden
+können im Spektrum lauter erscheinen als der eigentliche Lug-Ton. Fellton nutzt einen
+Score-Algorithmus um den wahrscheinlichsten Lug-Ton zu ermitteln:
 
-Fellton nutzt deshalb die bekannten Frequenzverhältnisse kreisförmiger Membranen
-als Heuristik: (1,1) ≈ 1,59× → (2,1) ≈ 2,14× → (0,2) ≈ 2,30× → (3,1) ≈ 2,65×
-der Grundmode. Der Algorithmus wählt die tiefste Spektralgruppe, zu der mindestens
-eine Obermode in einem dieser Verhältnisse (±8 %) existiert. Ist keine Bestätigung
-auffindbar, gewinnt die tiefste Gruppe als Fallback.
+**Kandidaten:** Nur Gruppen ≤440 Hz kommen als Lug-Ton infrage (Obermoden >440 Hz
+werden zur Bestätigung genutzt, aber nie als Ergebnis ausgegeben).
 
-Das ist eine praktische Näherung, keine akustische Messung – reale Felle weichen
-durch Kesselkopplung, ungleichmäßige Spannung und Dämpfung von den Idealwerten ab.
-In der Praxis liefert die Methode aber deutlich stabilere Ergebnisse als die reine
-Peakauswahl.
+**6-dB-Vorfilter:** Innerhalb der Lug-Kandidaten werden nur Gruppen berücksichtigt
+die höchstens 6 dB leiser sind als die lauteste Lug-Gruppe.
+
+**Score pro Kandidat** (±80 Cents Toleranz für die (1,1)-Membranmode ≈1,59×):
+- **+50** Moden-Bestätigung: eine Obermode im Verhältnis 1,59× gefunden
+- **−45** Obermode ist Lug-Kandidat: deutet darauf hin dass dieser Ton der Grundton
+  ist, nicht der Lug-Ton (beim Lug-Anschlag ist die (1,1)-Mode lauter als (0,1))
+- **+20** relative Lautstärke im 6-dB-Fenster
+- **+25** Nähe zur Filterreferenz wenn Filter aktiv
+- **−10** tiefste Gruppe (leichter Malus — tiefste Gruppe ist eher Grundton)
+
+Das ist eine praktische Heuristik, keine akustische Messung — reale Felle weichen
+durch Kesselkopplung und ungleichmäßige Spannung vom Idealmodell ab.
 
 Zusätzliche Maßnahmen:
 
 - **Plausible Frequenzbereiche je Trommelart:** Bassdrum 30–160 Hz, Toms 50–350 Hz,
-  Snare 150–600 Hz. Frequenzen außerhalb dieser Bereiche werden ignoriert. Die untere
-  Grenze der Snare liegt bei 150 Hz, weil Kessel- und Körperschall unterhalb davon
-  zuverlässig als Störpeak erkannt und fälschlicherweise bestätigt werden können.
+  Snare 90–600 Hz. Frequenzen außerhalb werden ignoriert. Die untere Snare-Grenze
+  liegt bei 90 Hz — tiefer liegende Kessel- und Körperschallresonanzen können sonst
+  fälschlicherweise als Lug-Ton erkannt werden.
 - **Filter** (siehe oben) für den kritischen Hochtonbereich
 
 Ein Vergleich gegen ein Hardware-Stimmgerät ergab im Normalbereich sehr ähnliche
@@ -197,7 +207,8 @@ Werte; oberhalb von etwa 300 Hz werden beide ungenauer.
 Die Mikrofon-Hardware bleibt der limitierende Faktor: Frequenzgang, Abstand zum Fell
 und Raumgeräusche wirken sich stärker aus als jede Software-Optimierung. Ein externes
 Mikrofon näher am Fell liefert zuverlässigere Werte als das eingebaute Laptop-/Handy-
-Mikrofon aus größerer Distanz.
+Mikrofon aus größerer Distanz. Wird ein Handy-Mikrofon verwendet, hilft es, das Gerät
+nah an die Anschlagsstelle zu halten.
 
 ## Technik
 
