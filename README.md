@@ -5,11 +5,6 @@ Build-Step, kein Backend – läuft komplett im Browser, auch offline.
 
 🔗 **Live:** https://snoth0x53.github.io/fellton/
 
-> **Lizenz:** MIT — kostenlos nutzbar und veränderbar, Namensnennung erforderlich.
-> Kommerzielle Nutzung bitte vorher anfragen.
-
-📖 **[Benutzeranleitung](ANLEITUNG.md)**
-
 ## Was das Tool macht
 
 - Grundton (Note + Oktave) und Resonance-Modus pro Trommel einstellen
@@ -161,10 +156,6 @@ HTTPS (oder `localhost`) – nicht in eingebetteten Vorschau-Fenstern. Für loka
 Tests: `python3 -m http.server 8000` im Projektordner, dann
 `http://localhost:8000` öffnen.
 
----
-
-Das separate **[Mikrofon-Test-Tool](ANLEITUNG-MIC-TEST.md)** hat eine eigene Anleitung.
-
 ## Genauigkeit der Mikrofon-Messung
 
 Nach jedem Anschlag wird das Frequenzspektrum per FFT analysiert (Fenstergröße 32768):
@@ -195,7 +186,9 @@ Peakauswahl.
 Zusätzliche Maßnahmen:
 
 - **Plausible Frequenzbereiche je Trommelart:** Bassdrum 30–160 Hz, Toms 50–350 Hz,
-  Snare 80–450 Hz
+  Snare 150–600 Hz. Frequenzen außerhalb dieser Bereiche werden ignoriert. Die untere
+  Grenze der Snare liegt bei 150 Hz, weil Kessel- und Körperschall unterhalb davon
+  zuverlässig als Störpeak erkannt und fälschlicherweise bestätigt werden können.
 - **Filter** (siehe oben) für den kritischen Hochtonbereich
 
 Ein Vergleich gegen ein Hardware-Stimmgerät ergab im Normalbereich sehr ähnliche

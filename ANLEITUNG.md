@@ -28,7 +28,8 @@ auf der PDF und hilft, mehrere Stimmungen auseinanderzuhalten.
 Jede Trommel hat folgende Einstellungen:
 
 **Typ** — Bass Drum, Tom, Floor Tom oder Snare. Der Typ bestimmt den zulässigen
-Frequenzbereich für die Mikrofon-Messung.
+Frequenzbereich für die Mikrofon-Messung: Snare 150–600 Hz, Tom/Floor Tom 50–350 Hz,
+Bassdrum 30–160 Hz. Frequenzen außerhalb werden ignoriert.
 
 **Durchmesser** — in Zoll, z. B. 14 für eine 14"-Snare. Wird zur Dokumentation
 verwendet.

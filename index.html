@@ -59,6 +59,7 @@
       <li><strong>Lugs</strong> — Anzahl Spannschrauben (bestimmt Kreuz-Stimmreihenfolge)</li>
       <li><strong>Grundton + Oktave</strong> — gewünschte Tonhöhe, Basis aller Berechnungen</li>
     </ul>
+    <p>Der Analysebereich der Mikrofon-Messung ist je nach Typ begrenzt: Snare 150–600 Hz, Tom/Floor Tom 50–350 Hz, Bassdrum 30–160 Hz.</p>
     <h3>Resonance-Modus (Toms / Bassdrum)</h3>
     <ul>
       <li><strong>Maximum (Unisono)</strong> — beide Felle gleich, volles Sustain</li>
@@ -116,6 +117,7 @@
       <li><strong>Lugs</strong> — number of tension rods (determines cross-tuning order)</li>
       <li><strong>Note + Octave</strong> — desired pitch, basis for all calculations</li>
     </ul>
+    <p>The microphone measurement range is limited by type: snare 150–600 Hz, tom/floor tom 50–350 Hz, bass drum 30–160 Hz.</p>
     <h3>Resonance mode (Toms / Bass Drum)</h3>
     <ul>
       <li><strong>Maximum (Unison)</strong> — both heads equal, full sustain</li>
@@ -244,7 +246,7 @@ function closeHelp() {
       footer5Title: "Kreuz-Stimmreihenfolge:",
       footer5: "Die Zahlen im Lug-Kreis zeigen nicht die physische Position, sondern die empfohlene Reihenfolge beim Stimmen: immer zum gegen\xFCberliegenden Lug, dann eine Schraube weiter und wieder gegen\xFCber \u2014 so verteilt sich die Spannung gleichm\xE4\xDFig, statt im Kreis herumzuwandern.",
       footer6Title: "Mikrofon-Messung:",
-      footer6: 'Der "\u{1F3A4} Messen"-Button pro Trommel wertet jeden Anschlag einzeln per FFT-Spektralanalyse aus und zeigt die kr\xE4ftigste Frequenzgruppe. Schl\xE4gst du nah am Lug an, ist das die Lug-Frequenz; mittig der Trommel-Grundton. Die Messung l\xE4uft, bis du sie manuell stoppst. Der Browser fragt einmalig um Mikrofon-Erlaubnis. Snare mit ausgeh\xE4ngtem Teppich messen.',
+      footer6: 'Der "\u{1F3A4} Messen"-Button pro Trommel wertet jeden Anschlag einzeln per FFT-Spektralanalyse aus und zeigt die kr\xE4ftigste Frequenzgruppe. Schl\xE4gst du nah am Lug an, ist das die Lug-Frequenz; mittig der Trommel-Grundton. Die Messung l\xE4uft, bis du sie manuell stoppst. Der Browser fragt einmalig um Mikrofon-Erlaubnis. Snare mit ausgeh\xE4ngtem Teppich messen. Der Analysebereich ist je nach Trommeltyp begrenzt: Snare 150\u2013600\u202fHz, Tom/Floor Tom 50\u2013350\u202fHz, Bassdrum 30\u2013160\u202fHz \u2014 Frequenzen au\xDFerhalb dieses Bereichs werden ignoriert.',
       footer7Title: "Profi-Durchschnitt:",
       footer7: "Diese Option basiert auf einer eigenen Auswertung von \xFCber 90 realen Trommel-Tunings professioneller Drummer, ver\xF6ffentlicht auf tune-bot.com/artists (Stand: eigene Analyse). Snare-Werte (n=22): Schlagfell \xD71,47, Intervall \xD71,29. Tom-Werte (n=60): Schlagfell \xD71,60, Resofell \xD71,92. Bassdrum-Werte (n=14): Schlagfell \xD71,62, Resofell \xD71,82. Offensichtliche Duplikate wurden vor der Mittelwertbildung entfernt.",
       footer8Title: "Filter-Funktion:",
@@ -304,7 +306,7 @@ function closeHelp() {
       footer5Title: "Cross-tuning order:",
       footer5: "The numbers in the lug circle show not the physical position, but the recommended tuning order: always go to the opposite lug, then one rod further and opposite again \u2014 this spreads the tension evenly instead of working around the circle.",
       footer6Title: "Microphone measurement:",
-      footer6: 'The "\u{1F3A4} Measure" button per drum analyzes each strike individually via FFT spectral analysis and shows the strongest frequency group. Strike close to the lug and it is the lug frequency; strike in the center and it is the drum fundamental. Measurement runs until you stop it manually. The browser asks for microphone permission once. Measure the snare with the wires disengaged.',
+      footer6: 'The "\u{1F3A4} Measure" button per drum analyzes each strike individually via FFT spectral analysis and shows the strongest frequency group. Strike close to the lug and it is the lug frequency; strike in the center and it is the drum fundamental. Measurement runs until you stop it manually. The browser asks for microphone permission once. Measure the snare with the wires disengaged. The analysis range is limited by drum type: snare 150\u2013600\u202fHz, tom/floor tom 50\u2013350\u202fHz, bass drum 30\u2013160\u202fHz \u2014 frequencies outside this range are ignored.',
       footer7Title: "Pro average:",
       footer7: "This option is based on our own analysis of over 90 real drum tunings from professional drummers, published at tune-bot.com/artists (as analyzed by us). Snare values (n=22): batter \xD71.47, interval \xD71.29. Tom values (n=60): batter \xD71.60, reso \xD71.92. Kick values (n=14): batter \xD71.62, reso \xD71.82. Obvious duplicates were removed before averaging.",
       footer8Title: "Filter function:",
@@ -437,7 +439,7 @@ function closeHelp() {
     const midi = Math.round(12 * Math.log2(hz / 440) + 69);
     return names[((midi % 12) + 12) % 12];
   }
-  const MIC_RANGE = { "Bass Drum": { min: 30, max: 160 }, "Tom": { min: 50, max: 350 }, "Floor Tom": { min: 50, max: 350 }, "Snare": { min: 80, max: 600 } };
+  const MIC_RANGE = { "Bass Drum": { min: 30, max: 160 }, "Tom": { min: 50, max: 350 }, "Floor Tom": { min: 50, max: 350 }, "Snare": { min: 150, max: 600 } };
   function getMicStream(deviceId) {
     return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false, deviceId: deviceId ? { exact: deviceId } : void 0 } });
   }
