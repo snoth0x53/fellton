@@ -721,19 +721,20 @@
       const TOLERANCE_CENTS_LIVE = 50;
       const MODE_RATIOS_CENTS_LIVE = [1.59].map(r => 1200 * Math.log2(r));
       const sortedLive = [...groups].sort((a, b) => a.freq - b.freq);
-      let strongest = groups.reduce((m, g) => g.db > m.db ? g : m);
-      const loudMaxDbLive = Math.max(...groups.map(g => g.db));
-      const loudLive = sortedLive.filter(g => g.db >= loudMaxDbLive - 10);
+      const lugCandidatesLive = sortedLive.filter(g => g.freq <= 440);
+      let strongest = lugCandidatesLive.length > 0
+        ? lugCandidatesLive.reduce((m, g) => g.db > m.db ? g : m)
+        : groups.reduce((m, g) => g.db > m.db ? g : m);
+      const loudMaxDbLive = lugCandidatesLive.length > 0
+        ? Math.max(...lugCandidatesLive.map(g => g.db))
+        : Math.max(...groups.map(g => g.db));
+      const loudLive = (lugCandidatesLive.length > 0 ? lugCandidatesLive : sortedLive)
+        .filter(g => g.db >= loudMaxDbLive - 10);
       for (const cand of loudLive) {
         const confirmed = MODE_RATIOS_CENTS_LIVE.some(tc =>
           sortedLive.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_LIVE)
         );
-        if (confirmed && cand.freq <= 440) { strongest = cand; break; }
-      }
-      // Fallback unter 440 Hz wenn stärkste Gruppe darüber liegt
-      if (strongest.freq > 440) {
-        const below = groups.filter(g => g.freq <= 440);
-        if (below.length > 0) strongest = below.reduce((m, g) => g.db > m.db ? g : m);
+        if (confirmed) { strongest = cand; break; }
       }
       pitchDisplay.textContent = strongest.freq.toFixed(1) + ' Hz (' + hzToNote(strongest.freq) + ')';
       peakList.textContent = groups.map(g => g.freq.toFixed(0)).join(' · ') + ' Hz';
@@ -760,19 +761,20 @@
           const TOLERANCE_CENTS_SNAP = 50;
           const MODE_RATIOS_CENTS_SNAP = [1.59].map(r => 1200 * Math.log2(r));
           const sortedSnap = [...snap.groups].sort((a, b) => a.freq - b.freq);
-          let snapMain = snap.groups.reduce((m, g) => g.db > m.db ? g : m);
-          const loudMaxDbSnap = Math.max(...snap.groups.map(g => g.db));
-          const loudSnap = sortedSnap.filter(g => g.db >= loudMaxDbSnap - 10);
+          const lugCandidatesSnap = sortedSnap.filter(g => g.freq <= 440);
+          let snapMain = lugCandidatesSnap.length > 0
+            ? lugCandidatesSnap.reduce((m, g) => g.db > m.db ? g : m)
+            : snap.groups.reduce((m, g) => g.db > m.db ? g : m);
+          const loudMaxDbSnap = lugCandidatesSnap.length > 0
+            ? Math.max(...lugCandidatesSnap.map(g => g.db))
+            : Math.max(...snap.groups.map(g => g.db));
+          const loudSnap = (lugCandidatesSnap.length > 0 ? lugCandidatesSnap : sortedSnap)
+            .filter(g => g.db >= loudMaxDbSnap - 10);
           for (const cand of loudSnap) {
             const confirmed = MODE_RATIOS_CENTS_SNAP.some(tc =>
               sortedSnap.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_SNAP)
             );
-            if (confirmed && cand.freq <= 440) { snapMain = cand; break; }
-          }
-          // Fallback unter 440 Hz
-          if (snapMain.freq > 440) {
-            const below = snap.groups.filter(g => g.freq <= 440);
-            if (below.length > 0) snapMain = below.reduce((m, g) => g.db > m.db ? g : m);
+            if (confirmed) { snapMain = cand; break; }
           }
           const gs = [...snap.groups].sort((a, b) => a.freq - b.freq);
           history.push(gs.map(g => g.freq));

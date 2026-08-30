@@ -424,22 +424,25 @@ function closeHelp() {
     if (candidates.length === 0) return null;
     if (candidates.length === 1) return candidates[0].freq;
     const sorted = [...candidates].sort((a, b) => a.freq - b.freq);
-    let result = candidates.reduce((m, g) => g.db > m.db ? g : m);
-    // Lautstärke-Vorfilter: nur Gruppen innerhalb 10 dB des stärksten Peaks
-    // kommen als Lug-Ton infrage — leises Rumpeln ist physikalisch kein Lug-Ton
-    const loudMaxDb = Math.max(...candidates.map(g => g.db));
-    const loud = sorted.filter(g => g.db >= loudMaxDb - 10);
+    // Gruppen über 440 Hz aus der Kandidatenliste für den Lug-Ton entfernen
+    // Sie können aber noch zur Moden-Bestätigung genutzt werden
+    const lugCandidates = sorted.filter(g => g.freq <= 440);
+    const result = lugCandidates.length > 0
+      ? lugCandidates.reduce((m, g) => g.db > m.db ? g : m)
+      : sorted.reduce((m, g) => g.db > m.db ? g : m);
+    // Lautstärke-Vorfilter: nur Gruppen innerhalb 10 dB des stärksten Lug-Kandidaten
+    const loudMaxDb = lugCandidates.length > 0
+      ? Math.max(...lugCandidates.map(g => g.db))
+      : Math.max(...candidates.map(g => g.db));
+    const loud = (lugCandidates.length > 0 ? lugCandidates : sorted)
+      .filter(g => g.db >= loudMaxDb - 10);
     for (const cand of loud) {
       const confirmed = MODE_RATIOS_CENTS.some(tc =>
         sorted.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS)
       );
-      if (confirmed && cand.freq <= 440) return cand.freq;
+      if (confirmed) return cand.freq;
     }
-    // Fallback: stärkste Gruppe unter 440 Hz
-    const below440 = candidates.filter(g => g.freq <= 440);
-    return below440.length > 0
-      ? below440.reduce((m, g) => g.db > m.db ? g : m).freq
-      : result.freq;
+    return result.freq;
   }
   function hzToNote(hz) {
     const names = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
