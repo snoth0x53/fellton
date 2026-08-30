@@ -594,7 +594,7 @@ function closeHelp() {
     { name: '22" Bass Drum', type: "Bass Drum", diameter: 22, lugs: 10, note: "C", octave: 2 },
     { name: '16" Floor Tom', type: "Floor Tom", diameter: 16, lugs: 8, note: "E", octave: 2 },
     { name: '14" Rack Tom', type: "Tom", diameter: 14, lugs: 8, note: "G#", octave: 2 },
-    { name: '14" Dynasonic', type: "Snare", diameter: 14, lugs: 10, note: "D#", octave: 3 }
+    { name: '14" Dynasonic', type: "Snare", diameter: 14, lugs: 10, note: "F", octave: 3 }
   ];
   const SNARE_TOP_BASE = 1.4;
   const SNARE_INTERVALS = { fifth: { label: "Perfekte Quinte", ratio: 1.5, topBase: null }, fourth: { label: "Perfekte Quarte", ratio: 1.333, topBase: null }, third: { label: "Gro\xDFe Terz", ratio: 1.26, topBase: null }, unison: { label: "Unisono (Maximum Resonance)", ratio: 1, topBase: null }, pro: { label: "Profi-Durchschnitt (empirisch, n=22)", ratio: 1.29, topBase: 1.47 } };
@@ -656,7 +656,7 @@ function closeHelp() {
     const handleHelp = () => { openHelp(lang); };
     const handleLang = (l) => { setLang(l); if (document.getElementById('helpPanel').classList.contains('open')) openHelp(l); };
     const [setName, setSetName] = useState("Rogers XP8");
-    const [drums, setDrums] = useState(DRUM_PRESETS.map((d, i) => ({ id: i, ...d, diameterInput: String(d.diameter).replace(".", ","), mode: "high", higherHead: "bottom", snareInterval: "fifth", calibratedA: null, calibLugInput: "", calibFundInput: "", showCalib: false })));
+    const [drums, setDrums] = useState(DRUM_PRESETS.map((d, i) => ({ id: i, ...d, diameterInput: String(d.diameter).replace(".", ","), mode: "high", higherHead: "bottom", snareInterval: d.type === "Snare" ? "pro" : "fifth", calibratedA: null, calibLugInput: "", calibFundInput: "", showCalib: false })));
     const addDrum = () => { setDrums([...drums, { id: nextId++, name: "Neue Trommel", type: "Tom", diameter: 12, diameterInput: "12", lugs: 6, note: "A", octave: 2, mode: "high", higherHead: "bottom", snareInterval: "fifth", calibratedA: null, calibLugInput: "", calibFundInput: "", showCalib: false }]); };
     const removeDrum = (id) => setDrums(drums.filter((d) => d.id !== id));
     const updateDrum = (id, patch) => setDrums(drums.map((d) => d.id === id ? { ...d, ...patch } : d));
