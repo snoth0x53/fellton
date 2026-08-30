@@ -402,7 +402,7 @@ function closeHelp() {
       peaks.length = 24;
       peaks.sort((a, b) => a.freq - b.freq);
     }
-    const groupGap = (f) => Math.max(8, f * 0.06);
+    const groupGap = (f) => Math.max(5, Math.min(14, f * 0.025));
     const subsets = []; let current = [peaks[0]];
     for (let k = 1; k < peaks.length; k++) {
       if (peaks[k].freq - peaks[k - 1].freq <= groupGap(peaks[k - 1].freq)) current.push(peaks[k]);
@@ -452,7 +452,7 @@ function closeHelp() {
         lugCandidates.some(g => g.freq !== cand.freq &&
           Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= 80)
       );
-      if (oberModeIstLugKandidat) score -= 25;
+      if (oberModeIstLugKandidat) score -= 20;
 
       // +20: relative Lautstärke im 6-dB-Fenster (normiert 0–20)
       score += 20 * (cand.db - loudMaxDb + 6) / 6;
