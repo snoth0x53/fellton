@@ -420,12 +420,13 @@ function closeHelp() {
     if (candidates.length === 1) return candidates[0].freq;
     const sorted = [...candidates].sort((a, b) => a.freq - b.freq);
     let result = candidates.reduce((m, g) => g.db > m.db ? g : m);
-    for (const cand of sorted) {
+    // Lautstärke-Vorfilter: nur Gruppen innerhalb 10 dB des stärksten Peaks
+    // kommen als Lug-Ton infrage — leises Rumpeln ist physikalisch kein Lug-Ton
+    const loudMaxDb = Math.max(...candidates.map(g => g.db));
+    const loud = sorted.filter(g => g.db >= loudMaxDb - 10);
+    for (const cand of loud) {
       const confirmed = MODE_RATIOS_CENTS.some(tc =>
-        sorted.some(g =>
-          Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS ||
-          Math.abs(1200 * Math.log2(cand.freq / g.freq) - tc) <= TOLERANCE_CENTS
-        )
+        sorted.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS)
       );
       if (confirmed) return cand.freq;
     }
