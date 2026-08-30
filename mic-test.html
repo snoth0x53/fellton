@@ -607,9 +607,10 @@
     const head   = metaHead.value.trim();
     const notes  = metaNotes.value.trim();
     const rating = starValue || '';   // ← fix: leer statt "—"
-    const header = 'Nr,Zeit,Gruppen_Hz,YIN_Hz,Pegel_pct,SoundScore,Trommel,Fell,Bewertung,Notizen';
+    const header = 'Nr,Zeit,Gruppen_Hz,Gruppen_dB,YIN_Hz,Pegel_pct,SoundScore,Trommel,Fell,Bewertung,Notizen';
     const rows = hits.map((h, i) =>
       [i+1, h.time, '"' + h.groups + '"',
+       '"' + (h.groupsDb || '') + '"',
        h.yin > 0 ? h.yin.toFixed(1) : '',
        h.rms.toFixed(3),
        h.score != null ? h.score : '',
@@ -721,12 +722,11 @@
       const MODE_RATIOS_CENTS_LIVE = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
       const sortedLive = [...groups].sort((a, b) => a.freq - b.freq);
       let strongest = groups.reduce((m, g) => g.db > m.db ? g : m);
-      for (const cand of sortedLive) {
+      const loudMaxDbLive = Math.max(...groups.map(g => g.db));
+      const loudLive = sortedLive.filter(g => g.db >= loudMaxDbLive - 10);
+      for (const cand of loudLive) {
         const confirmed = MODE_RATIOS_CENTS_LIVE.some(tc =>
-          sortedLive.some(g =>
-            Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_LIVE ||
-            Math.abs(1200 * Math.log2(cand.freq / g.freq) - tc) <= TOLERANCE_CENTS_LIVE
-          )
+          sortedLive.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_LIVE)
         );
         if (confirmed) { strongest = cand; break; }
       }
@@ -756,17 +756,16 @@
           const MODE_RATIOS_CENTS_SNAP = [1.59, 2.14, 2.30, 2.65].map(r => 1200 * Math.log2(r));
           const sortedSnap = [...snap.groups].sort((a, b) => a.freq - b.freq);
           let snapMain = snap.groups.reduce((m, g) => g.db > m.db ? g : m);
-          for (const cand of sortedSnap) {
+          const loudMaxDbSnap = Math.max(...snap.groups.map(g => g.db));
+          const loudSnap = sortedSnap.filter(g => g.db >= loudMaxDbSnap - 10);
+          for (const cand of loudSnap) {
             const confirmed = MODE_RATIOS_CENTS_SNAP.some(tc =>
-              sortedSnap.some(g =>
-                Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_SNAP ||
-                Math.abs(1200 * Math.log2(cand.freq / g.freq) - tc) <= TOLERANCE_CENTS_SNAP
-              )
+              sortedSnap.some(g => Math.abs(1200 * Math.log2(g.freq / cand.freq) - tc) <= TOLERANCE_CENTS_SNAP)
             );
             if (confirmed) { snapMain = cand; break; }
           }
-          const gs = snap.groups.map(g => g.freq).sort((a, b) => a - b);
-          history.push(gs);
+          const gs = [...snap.groups].sort((a, b) => a.freq - b.freq);
+          history.push(gs.map(g => g.freq));
           if (history.length > HISTORY_SIZE) history.shift();
           const stableHz = pickStablePeak(history);
           stableDisplay.textContent = stableHz != null
@@ -776,7 +775,8 @@
           renderScore(score);
           hits.push({
             time:   new Date().toLocaleTimeString(TT[lang].locale),
-            groups: gs.map(f => f.toFixed(0)).join(' · '),
+            groups: gs.map(g => g.freq.toFixed(0)).join(' · '),
+            groupsDb: gs.map(g => g.freq.toFixed(0) + '@' + g.db.toFixed(1)).join(' · '),
             yin:    yinSnap.freq,
             rms:    snapRMS,
             score:  score ? score.total : null,
