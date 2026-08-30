@@ -106,7 +106,7 @@ zusammenrücken. Dafür gibt es den **Filter**:
 
 1. Erst eine korrekte Messung machen.
 2. **Filter**-Button drücken — der zuletzt gemessene Wert wird zur Referenz.
-3. Ab dann werden nur noch Frequenzen im Bereich von ±1,5 Halbtönen um diesen Wert
+3. Ab dann werden nur noch Frequenzen im Bereich von ±2 Halbtönen um diesen Wert
    berücksichtigt. Oktavfehler und Störpeaks fallen heraus.
 
 Filter wieder ausschalten: nochmal auf **Filter** drücken. Bei größeren

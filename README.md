@@ -52,8 +52,8 @@ Problem betrifft auch Hardware-Stimmgeräte.
 
 Dafür gibt es den Filter: Erst eine korrekte Messung machen, dann **Filter** drücken.
 Dieser Wert wird zur Referenz, und ab dann kommen nur noch Frequenzen im Umkreis von
-**anderthalb Halbtönen** infrage. Bei 297 Hz ergibt das ein Band von etwa 272 bis
-324 Hz – benachbarte Partialtöne, Oktavfehler und tiefe Störpeaks fallen heraus.
+**zwei Halbtönen** infrage. Bei 297 Hz ergibt das ein Band von etwa 264 bis
+333 Hz – benachbarte Partialtöne, Oktavfehler und tiefe Störpeaks fallen heraus.
 
 Das Band ist bewusst musikalisch definiert statt prozentual: Ein fester Prozentwert
 wirkt im Bass eng und im Hochtonbereich viel zu weit (±20 % sind bei 300 Hz bereits
