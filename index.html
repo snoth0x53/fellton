@@ -414,7 +414,7 @@ function closeHelp() {
     groups.sort((a, b) => a.freq - b.freq);
     return { groups };
   }
-  const TOLERANCE_CENTS = 35; // ±35 Cents — enger als Viertelton, verhindert Körperschall-Bestätigung
+  const TOLERANCE_CENTS = 50; // ±50 Cents — sicher mit 1,59-only (keine höheren Moden mehr)
   // Nur die (1,1)-Mode (≈1,59×) wird zur Bestätigung genutzt. Die höheren Moden
   // 2,14 / 2,30 / 2,65 liegen so eng beieinander, dass sie mit ±35 Cents ein
   // durchgehendes Band bilden und in dichten Spektren zufällig treffen.

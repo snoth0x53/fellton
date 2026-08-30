@@ -718,7 +718,7 @@
       // Membranmoden-Verhältnisse: (0,1)=1 → (1,1)≈1.59 → (2,1)≈2.14 → (0,2)≈2.30 → (3,1)≈2.65
       // Tiefste moden-bestätigte Gruppe wählen.
       // Fallback: stärkste Gruppe (nicht tiefste) — verhindert 100Hz-Phantom bei hohen Stimmungen.
-      const TOLERANCE_CENTS_LIVE = 35;
+      const TOLERANCE_CENTS_LIVE = 50;
       const MODE_RATIOS_CENTS_LIVE = [1.59].map(r => 1200 * Math.log2(r));
       const sortedLive = [...groups].sort((a, b) => a.freq - b.freq);
       let strongest = groups.reduce((m, g) => g.db > m.db ? g : m);
@@ -752,7 +752,7 @@
         if (snapRMS < 0.001) return;
         if (snap && snap.groups.length) {
           // Identische Logik wie Live-Anzeige: tiefste moden-bestätigte Gruppe
-          const TOLERANCE_CENTS_SNAP = 35;
+          const TOLERANCE_CENTS_SNAP = 50;
           const MODE_RATIOS_CENTS_SNAP = [1.59].map(r => 1200 * Math.log2(r));
           const sortedSnap = [...snap.groups].sort((a, b) => a.freq - b.freq);
           let snapMain = snap.groups.reduce((m, g) => g.db > m.db ? g : m);
