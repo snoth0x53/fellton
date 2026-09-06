@@ -58,20 +58,7 @@ Problem betrifft auch Hardware-Stimmgeräte.
 
 Dafür gibt es den Filter: Erst eine korrekte Messung machen, dann **Filter** drücken.
 Dieser Wert wird zur Referenz, und ab dann kommen nur noch Frequenzen im Umkreis von
-**zwei Halbtönen** infrage. Bei 297 Hz ergibt das ein Band von etwa 264 bis
-333 Hz – benachbarte Partialtöne, Oktavfehler und tiefe Störpeaks fallen heraus.
-
-Das Band ist bewusst musikalisch definiert statt prozentual: Ein fester Prozentwert
-wirkt im Bass eng und im Hochtonbereich viel zu weit. Eine Halbton-Angabe bleibt über
-den ganzen Bereich gleich streng.
-
-Bei größeren Stimmänderungen einfach neu setzen; für jede Trommel gilt der Filter
-getrennt. Beim Fellwechsel, wenn du von ganz unten hocharbeitest, lässt du ihn am
-besten aus. Die Gruppen-Liste unter dem Messwert zeigt weiterhin alle erkannten
-Rohwerte, auch die vom Filter verworfenen – so siehst du, wenn der Filter etwas
-Echtes ausblendet.
-
-Die Bandbreite lässt sich im Code über die Konstante `FILTER_SEMITONES` anpassen.
+**zwei Halbtönen** infrage — benachbarte Partialtöne, Oktavfehler und tiefe Störpeaks fallen heraus.
 
 ## Grundton messen und kalibrieren
 
@@ -164,31 +151,22 @@ Tests: `python3 -m http.server 8000` im Projektordner, dann
 
 ## Genauigkeit der Mikrofon-Messung
 
-Nach jedem Anschlag wird das Frequenzspektrum per FFT analysiert (Fenstergröße 32768):
-Alle Peaks über einer Schwelle (18 dB unter dem stärksten) werden ermittelt, die 24
-lautesten behalten und nach spektraler Nähe gruppiert. Der Gruppierungsabstand skaliert
-mit der Frequenz (6 %, mindestens 8 Hz). Parabel-Interpolation verfeinert die
-Auflösung auf unter 1 Hz.
+Nach jedem Anschlag wird das Frequenzspektrum per FFT analysiert. Peaks werden
+ermittelt, nach Lautstärke gefiltert und nach spektraler Nähe gruppiert. Der
+Gruppierungsabstand skaliert mit der Frequenz. Parabel-Interpolation verfeinert die
+Auflösung auf unter 1 Hz. Snapshots mit zu schwachem Signal werden automatisch
+verworfen.
 
 ### Score-basierte Lug-Ton-Erkennung
 
 Ein Fell schwingt in mehreren überlagerten Moden gleichzeitig, und die Obermoden
 können im Spektrum lauter erscheinen als der eigentliche Lug-Ton. Fellton nutzt einen
-Score-Algorithmus um den wahrscheinlichsten Lug-Ton zu ermitteln:
+Score-Algorithmus um den wahrscheinlichsten Lug-Ton zu ermitteln.
 
-**Kandidaten:** Nur Gruppen ≤440 Hz kommen als Lug-Ton infrage (Obermoden >440 Hz
-werden zur Bestätigung genutzt, aber nie als Ergebnis ausgegeben).
-
-**6-dB-Vorfilter:** Innerhalb der Lug-Kandidaten werden nur Gruppen berücksichtigt
-die höchstens 6 dB leiser sind als die lauteste Lug-Gruppe.
-
-**Score pro Kandidat** (±80 Cents Toleranz für die (1,1)-Membranmode ≈1,59×):
-- **+50** Moden-Bestätigung: eine Obermode im Verhältnis 1,59× gefunden
-- **−45** Obermode ist Lug-Kandidat: deutet darauf hin dass dieser Ton der Grundton
-  ist, nicht der Lug-Ton (beim Lug-Anschlag ist die (1,1)-Mode lauter als (0,1))
-- **+20** relative Lautstärke im 6-dB-Fenster
-- **+25** Nähe zur Filterreferenz wenn Filter aktiv
-- **−10** tiefste Gruppe (leichter Malus — tiefste Gruppe ist eher Grundton)
+Dabei werden nur Frequenzen unterhalb eines plausiblen Maximalwerts als Lug-Ton-
+Kandidaten betrachtet. Höhere Peaks dürfen weiterhin zur Moden-Bestätigung genutzt
+werden. Jeder Kandidat wird anhand von Moden-Bestätigung, Signalstärke und
+spektralem Kontext bewertet — der wahrscheinlichste Lug-Ton gewinnt.
 
 Das ist eine praktische Heuristik, keine akustische Messung — reale Felle weichen
 durch Kesselkopplung und ungleichmäßige Spannung vom Idealmodell ab.
