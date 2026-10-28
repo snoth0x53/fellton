@@ -5,8 +5,9 @@ Build-Step, kein Backend – läuft komplett im Browser, auch offline.
 
 🔗 **Live:** https://snoth0x53.github.io/fellton/
 
-> **Lizenz:** MIT — kostenlos nutzbar und veränderbar, Namensnennung erforderlich.
-> Kommerzielle Nutzung bitte vorher anfragen.
+📱 **iOS-App:** [Fellton im App Store](https://apps.apple.com/de/app/id6813836659)
+
+> **Lizenz:** [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.de) — Nutzung und Weitergabe erlaubt, auch mit Änderungen, Namensnennung erforderlich. Kommerzielle Nutzung nicht gestattet.
 
 📖 **[Benutzeranleitung](ANLEITUNG.md)**
 
